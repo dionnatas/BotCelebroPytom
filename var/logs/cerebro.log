@@ -1,17 +1,30 @@
-2025-03-05 12:09:18,548 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
-2025-03-05 12:09:18,767 - src.database.db_manager - INFO - Banco de dados inicializado com sucesso.
-2025-03-05 12:09:18,877 - src.bot.cerebro_bot - INFO - Handlers registrados com sucesso
-2025-03-05 12:09:18,877 - src.bot.cerebro_bot - INFO - Bot Cerebro inicializado com sucesso
-2025-03-05 12:09:18,877 - __main__ - INFO - Iniciando o bot Cerebro...
-2025-03-05 12:09:18,877 - src.bot.cerebro_bot - INFO - Iniciando o bot...
-2025-03-05 12:09:18,877 - apscheduler.scheduler - INFO - Scheduler started
-2025-03-05 12:09:20,136 - src.bot.cerebro_bot - INFO - Bot iniciado com PID 80925
-2025-03-05 12:14:46,775 - telegram.ext.updater - INFO - Received signal 15 (SIGTERM), stopping...
-2025-03-05 12:14:46,776 - apscheduler.scheduler - INFO - Scheduler has been shut down
-2025-03-05 12:14:51,531 - __main__ - INFO - Bot finalizado
-2025-03-05 14:07:11,861 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
-2025-03-05 14:07:12,025 - __main__ - INFO - Handlers registrados com sucesso
-2025-03-05 14:07:12,025 - __main__ - INFO - Bot Cerebro inicializado com sucesso
-2025-03-05 14:09:36,257 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
-2025-03-05 14:09:36,365 - __main__ - INFO - Handlers registrados com sucesso
-2025-03-05 14:09:36,365 - __main__ - INFO - Bot Cerebro inicializado com sucesso
+2025-03-05 16:08:19,082 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
+2025-03-05 16:08:19,406 - src.bot.cerebro_bot - INFO - Handlers registrados com sucesso
+2025-03-05 16:08:19,406 - src.bot.cerebro_bot - INFO - Bot Cerebro inicializado com sucesso
+2025-03-05 16:08:19,406 - __main__ - INFO - Iniciando o bot Cerebro...
+2025-03-05 16:08:19,406 - src.bot.cerebro_bot - INFO - Iniciando o bot...
+2025-03-05 16:08:19,406 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-05 16:08:20,592 - src.bot.cerebro_bot - INFO - Bot iniciado com PID 15389
+2025-03-05 16:08:39,854 - src.bot.bot_utils - INFO - Verificando autorização para chat_id: 496235723
+2025-03-05 16:08:39,855 - src.bot.bot_utils - INFO - Acesso autorizado para chat_id: 496235723
+2025-03-05 16:08:39,860 - src.bot.bot_utils - INFO - Verificando autorização para chat_id: 496235723
+2025-03-05 16:08:39,860 - src.bot.bot_utils - INFO - Acesso autorizado para chat_id: 496235723
+2025-03-05 16:08:42,298 - src.transcription.transcriber - INFO - Convertendo áudio para WAV...
+2025-03-05 16:08:42,299 - src.transcription.audio_processor - INFO - Arquivo de áudio existe e tem tamanho: 197808 bytes
+2025-03-05 16:08:42,325 - src.transcription.audio_processor - INFO - Informações do arquivo: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpue373bjy/audio_AwACAgEAAxkBAAIBTWfIn6tu_gShqpVLVRlA_lTPdX0hAAIOBQACQNVBRsPkVUXiMUYCNgQ.ogg: Ogg data, Opus audio, version 0.1, mono, 48000 Hz (Input Sample Rate)
+
+2025-03-05 16:08:42,326 - src.transcription.audio_processor - INFO - Detectado formato OGG
+2025-03-05 16:08:42,519 - src.transcription.audio_processor - INFO - Configurando áudio para mono e 16kHz...
+2025-03-05 16:08:42,525 - src.transcription.audio_processor - INFO - Exportando para WAV: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpmcx8ydv0.wav
+2025-03-05 16:08:42,526 - src.transcription.audio_processor - INFO - Arquivo WAV criado com sucesso: 612748 bytes
+2025-03-05 16:08:42,526 - src.transcription.transcriber - INFO - Transcrevendo áudio usando API REST...
+2025-03-05 16:08:42,526 - src.transcription.transcriber - INFO - Método 1: Usando arquivo diretamente
+2025-03-05 16:08:44,186 - src.transcription.transcriber - INFO - Código de status da resposta: 200
+2025-03-05 16:08:44,187 - src.transcription.transcriber - INFO - Texto transcrito: 'Como eu faço o macarrão à bolonhesa com o molho branco?'
+2025-03-05 16:08:44,187 - src.transcription.transcriber - INFO - Transcrição bem-sucedida com Método 1!
+2025-03-05 16:08:44,188 - src.transcription.transcriber - INFO - Arquivo temporário removido: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpmcx8ydv0.wav
+2025-03-05 16:08:44,873 - src.services.openai_service - INFO - Classificando mensagem...
+2025-03-05 16:08:45,912 - src.services.openai_service - INFO - Resposta da classificação: ["QUESTAO","Como eu faço o macarrão à bolonhesa com o molho branco?", "Receita de macarrão à bolonhesa"]
+2025-03-05 16:08:45,912 - src.bot.message_handlers - INFO - Mensagem classificada: QUESTAO | Categoria: Como eu faço o macarrão à bolonhesa com o molho branco? | Ação: Receita de macarrão à bolonhesa
+2025-03-05 16:08:46,252 - src.services.openai_service - INFO - Respondendo questão...
+2025-03-05 16:08:49,789 - src.services.openai_service - INFO - Resposta gerada com sucesso
