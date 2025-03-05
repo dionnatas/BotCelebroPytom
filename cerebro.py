@@ -3,6 +3,8 @@ import openai
 import secrets_cerebro
 import tempfile
 import time
+import pytz
+from datetime import datetime
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
@@ -68,7 +70,7 @@ def main():
     """Inicializa o bot."""
     while True:
         try:
-            app = Application.builder().token(TELEGRAM_API_KEY).build()
+            app = Application.builder().token(TELEGRAM_API_KEY).local_timezone(pytz.utc).build()
             app.add_handler(CommandHandler("start", start))
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
             
