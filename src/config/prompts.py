@@ -1,4 +1,8 @@
-prompt_classificador = """
+"""
+Prompts utilizados pelo bot Cerebro.
+"""
+
+CLASSIFICADOR_PROMPT = """
 Você é um assitente desenhado para ajudar a classificar mensagens e gerar output do tipo de mensagem e conteudo.
 
 As mensagens podem dos seguintes tipos:
@@ -18,7 +22,7 @@ exemplo:
 Segue mensagem para análise:
 """
 
-prompt_brainstorm = """
+BRAINSTORM_PROMPT = """
 Você é um especialista em inovação e tem experiência com startups e negócios.
 Baseado na ideia a seguir, por favor faça um brainstorm de como essa ideia poderia ser implementada,
 quais são os:
@@ -29,4 +33,3 @@ Oportunidades
 
 Segue ideia para análise:
 """
-    

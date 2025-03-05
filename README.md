@@ -82,13 +82,13 @@ pip install -r requirements.txt
 
 ## Executando o Cérebro
 
-Execute `cerebro.py` para iniciar o bot:
+Execute `main.py` para iniciar o bot:
 ```sh
-python cerebro.py
+python main.py
 ```
 Isso ativará o Cerebro na sua conta do Telegram, pronto para receber e processar suas entradas. Da primeira vez que você tentar conversar com o Cerebro ele não identificará você. Você precisará capturar o código do usuário no terminal e inserí-lo no arquivo `secrets_cerebro.py`
 
-**Inicialização do Banco de Dados**: A primeira execução do `cerebro.py` configurará automaticamente o banco de dados SQLite necessário (`cerebro.db`) para armazenar dados da sessão.
+**Inicialização do Banco de Dados**: A primeira execução do `main.py` configurará automaticamente o banco de dados SQLite necessário para armazenar dados da sessão.
 
 ## Uso
 
@@ -199,10 +199,10 @@ Se preferir, você pode executar o bot manualmente:
 
 ```sh
 # Execução normal
-python cerebro.py
+python main.py
 
 # Execução em segundo plano
-nohup python cerebro.py > cerebro.log 2>&1 &
+nohup python main.py > cerebro.log 2>&1 &
 ```
 
 #### 3. Corrigindo problemas de compatibilidade

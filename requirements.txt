@@ -4,5 +4,8 @@ python-telegram-bot==13.12
 requests>=2.30.0
 urllib3>=1.26.15
 
+# Processamento de áudio
+pydub>=0.25.1
+
 # Dependências opcionais para compatibilidade
 python-dotenv>=0.19.0

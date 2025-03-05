@@ -35,7 +35,7 @@ if [ ! -z "$STORED_PID" ]; then
 fi
 
 # Verifica se há algum processo python rodando cerebro.py
-PYTHON_PIDS=$(ps -ef | grep "python.*cerebro\.py" | grep -v grep | awk '{print $2}')
+PYTHON_PIDS=$(ps -ef | grep "python.*cerebro\.py\|python3.*cerebro\.py" | grep -v grep | awk '{print $2}')
 if [ ! -z "$PYTHON_PIDS" ]; then
     for pid in $PYTHON_PIDS; do
         if [ "$pid" != "$STORED_PID" ]; then
@@ -58,11 +58,11 @@ fi
 
 # Aplica correções para o ambiente Termux
 echo "Aplicando correções para o ambiente Termux..."
-python fix_termux.py
+python3 fix_termux.py
 
 # Executa o bot em segundo plano
 echo "Iniciando o bot Cerebro em segundo plano..."
-nohup python cerebro.py > cerebro.log 2>&1 &
+nohup python3 cerebro.py > cerebro.log 2>&1 &
 
 # Salva o PID do processo
 NEW_PID=$!

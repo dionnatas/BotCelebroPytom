@@ -1,0 +1,64 @@
+2025-03-05 11:37:22,508 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
+2025-03-05 11:37:22,744 - src.database.db_manager - INFO - Banco de dados inicializado com sucesso.
+2025-03-05 11:37:22,848 - src.bot.cerebro_bot - INFO - Handlers registrados com sucesso
+2025-03-05 11:37:22,848 - src.bot.cerebro_bot - INFO - Bot Cerebro inicializado com sucesso
+2025-03-05 11:37:22,848 - __main__ - INFO - Iniciando o bot Cerebro...
+2025-03-05 11:37:22,848 - src.bot.cerebro_bot - INFO - Iniciando o bot...
+2025-03-05 11:37:22,848 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-05 11:37:24,324 - src.bot.cerebro_bot - INFO - Bot iniciado com PID 70428
+2025-03-05 11:39:21,825 - src.services.openai_service - INFO - Classificando mensagem...
+2025-03-05 11:39:23,617 - src.services.openai_service - INFO - Resposta da classificação: Esta mensagem não se encaixa em nenhum dos tipos (IDEIA ou QUESTAO) específicos que você definiu. Você gostaria de tentar novamente com uma mensagem que se enquadre em um desses tipos?
+2025-03-05 11:39:23,618 - src.services.openai_service - WARNING - Não foi possível classificar a mensagem, usando fallback
+2025-03-05 11:39:23,621 - src.database.db_manager - INFO - Ideia salva com ID: 5
+2025-03-05 11:39:32,544 - src.database.db_manager - INFO - Listadas 5 ideias
+2025-03-05 11:39:45,923 - src.bot.handlers - INFO - Mensagem de voz recebida de Dionnatas (ID: 496235723)
+2025-03-05 11:39:46,255 - src.bot.handlers - INFO - Arquivo de áudio do Telegram: ID=AwACAgEAAxkBAAOZZ8hiMbq81gbtZkPVa329NDydMoEAAvUEAAJA1UFGpujcrxl9uEY2BA, Duração=2s
+2025-03-05 11:39:47,689 - src.bot.handlers - INFO - Informações do arquivo: {'ok': True, 'result': {'file_id': 'AwACAgEAAxkBAAOZZ8hiMbq81gbtZkPVa329NDydMoEAAvUEAAJA1UFGpujcrxl9uEY2BA', 'file_unique_id': 'AgAD9QQAAkDVQUY', 'file_size': 55256, 'file_path': 'voice/file_23.oga'}}
+2025-03-05 11:39:47,690 - src.bot.handlers - INFO - Caminho do arquivo no servidor do Telegram: voice/file_23.oga
+2025-03-05 11:39:47,691 - src.bot.handlers - INFO - Baixando arquivo de https://api.telegram.org/file/bot8013190519:AAHjYoTQWFO2UVkI-YmUmPqz3DpPVnR4r2E/voice/file_23.oga
+2025-03-05 11:39:48,895 - src.bot.handlers - INFO - Arquivo baixado para /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpblrigd6y.ogg (55256 bytes)
+2025-03-05 11:39:48,908 - src.bot.handlers - INFO - Formato do arquivo: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpblrigd6y.ogg: Ogg data, Opus audio, version 0.1, mono, 48000 Hz (Input Sample Rate)
+2025-03-05 11:39:48,916 - src.bot.handlers - INFO - Formato do arquivo: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpblrigd6y.ogg: Ogg data, Opus audio, version 0.1, mono, 48000 Hz (Input Sample Rate)
+2025-03-05 11:39:48,917 - src.bot.handlers - INFO - Lendo 55256 bytes do arquivo original
+2025-03-05 11:39:48,917 - src.bot.handlers - INFO - Cópia do áudio salva para testes em: /Users/Payface/CascadeProjects/BotCelebroPytom/test_audio/telegram_audio.ogg (55256 bytes)
+2025-03-05 11:39:48,918 - src.bot.handlers - INFO - Arquivo de áudio válido: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpblrigd6y.ogg (55256 bytes)
+2025-03-05 11:39:48,918 - src.transcription.transcriber - INFO - Convertendo áudio para WAV...
+2025-03-05 11:39:48,918 - src.transcription.audio_processor - INFO - Arquivo de áudio existe e tem tamanho: 55256 bytes
+2025-03-05 11:39:48,933 - src.transcription.audio_processor - INFO - Informações do arquivo: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpblrigd6y.ogg: Ogg data, Opus audio, version 0.1, mono, 48000 Hz (Input Sample Rate)
+
+2025-03-05 11:39:48,933 - src.transcription.audio_processor - INFO - Detectado formato OGG
+2025-03-05 11:39:49,114 - src.transcription.audio_processor - INFO - Configurando áudio para mono e 16kHz...
+2025-03-05 11:39:49,116 - src.transcription.audio_processor - INFO - Exportando para WAV: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpn12qhgdf.wav
+2025-03-05 11:39:49,116 - src.transcription.audio_processor - INFO - Arquivo WAV criado com sucesso: 169868 bytes
+2025-03-05 11:39:49,116 - src.transcription.transcriber - INFO - Transcrevendo áudio usando API REST...
+2025-03-05 11:39:49,117 - src.transcription.transcriber - INFO - Método 1: Usando arquivo diretamente
+2025-03-05 11:39:50,940 - src.transcription.transcriber - INFO - Código de status da resposta: 200
+2025-03-05 11:39:50,940 - src.transcription.transcriber - INFO - Texto transcrito: 'Testando a transcrição de áudio.'
+2025-03-05 11:39:50,941 - src.transcription.transcriber - INFO - Transcrição bem-sucedida com Método 1!
+2025-03-05 11:39:50,941 - src.transcription.transcriber - INFO - Arquivo temporário removido: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpn12qhgdf.wav
+2025-03-05 11:39:50,942 - src.bot.handlers - INFO - Transcrição bem-sucedida: 'Testando a transcrição de áudio.'
+2025-03-05 11:39:50,942 - src.services.openai_service - INFO - Classificando mensagem...
+2025-03-05 11:39:51,752 - src.services.openai_service - INFO - Resposta da classificação: ["IDEIA","Testar transcrição de áudio para facilitar a documentação e acessibilidade", "Transcrição de áudio"]
+2025-03-05 11:39:51,756 - src.database.db_manager - INFO - Ideia salva com ID: 6
+2025-03-05 11:39:52,088 - src.bot.handlers - INFO - Arquivo temporário removido: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpblrigd6y.ogg
+2025-03-05 11:39:57,960 - src.services.openai_service - INFO - Classificando mensagem...
+2025-03-05 11:39:58,882 - src.services.openai_service - INFO - Resposta da classificação: Essa mensagem não se enquadra nos tipos de mensagens que eu posso classificar. Por favor, forneça uma mensagem válida para que eu possa ajudar a classificá-la.
+2025-03-05 11:39:58,883 - src.services.openai_service - WARNING - Não foi possível classificar a mensagem, usando fallback
+2025-03-05 11:39:58,886 - src.database.db_manager - INFO - Ideia salva com ID: 7
+2025-03-05 11:40:06,813 - src.services.openai_service - INFO - Classificando mensagem...
+2025-03-05 11:40:08,379 - src.services.openai_service - INFO - Resposta da classificação: Não consigo classificar essa mensagem, pois não se encaixa nos tipos de mensagens previamente definidos (IDEIA ou QUESTAO). Por favor, envie uma mensagem válida para que eu possa ajudar a classificá-la corretamente.
+2025-03-05 11:40:08,380 - src.services.openai_service - WARNING - Não foi possível classificar a mensagem, usando fallback
+2025-03-05 11:40:08,383 - src.database.db_manager - INFO - Ideia salva com ID: 8
+2025-03-05 11:40:15,836 - src.database.db_manager - INFO - Listadas 8 ideias
+a documentação e acessibilidade", "Transcrição de áudio"]
+2025-03-05 11:39:51,756 - src.database.db_manager - INFO - Ideia salva com ID: 6
+2025-03-05 11:39:52,088 - src.bot.handlers - INFO - Arquivo temporário removido: /var/folders/0h/d2yvgtyn0bj20zm5sf5fnmdr0000gp/T/tmpblrigd6y.ogg
+2025-03-05 11:39:57,960 - src.services.openai_service - INFO - Classificando mensagem...
+2025-03-05 11:39:58,882 - src.services.openai_service - INFO - Resposta da classificação: Essa mensagem não se enquadra nos tipos de mensagens que eu posso classificar. Por favor, forneça uma mensagem válida para que eu possa ajudar a classificá-la.
+2025-03-05 11:39:58,883 - src.services.openai_service - WARNING - Não foi possível classificar a mensagem, usando fallback
+2025-03-05 11:39:58,886 - src.database.db_manager - INFO - Ideia salva com ID: 7
+2025-03-05 11:40:06,813 - src.services.openai_service - INFO - Classificando mensagem...
+2025-03-05 11:40:08,379 - src.services.openai_service - INFO - Resposta da classificação: Não consigo classificar essa mensagem, pois não se encaixa nos tipos de mensagens previamente definidos (IDEIA ou QUESTAO). Por favor, envie uma mensagem válida para que eu possa ajudar a classificá-la corretamente.
+2025-03-05 11:40:08,380 - src.services.openai_service - WARNING - Não foi possível classificar a mensagem, usando fallback
+2025-03-05 11:40:08,383 - src.database.db_manager - INFO - Ideia salva com ID: 8
+2025-03-05 11:40:15,836 - src.database.db_manager - INFO - Listadas 8 ideias
