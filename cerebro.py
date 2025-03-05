@@ -3,11 +3,6 @@ import openai
 import secrets_cerebro
 import tempfile
 import time
-import os
-import pytz
-
-
-
 from datetime import datetime
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
@@ -26,20 +21,19 @@ openai.api_key = OPENAI_API_KEY
 
 def start(update: Update, context: CallbackContext) -> None:
     """Envia mensagem de boas-vindas ao usuário."""
-    if update.message.chat_id not in MY_CHAT_ID:
+    if update.message.chat_id != MY_CHAT_ID:
         update.message.reply_text("Acesso não autorizado.")
         return
     update.message.reply_text("Olá! Envie uma mensagem de texto ou áudio para começar.")
 
 def handle_message(update: Update, context: CallbackContext) -> None:
     """Lida com mensagens de texto ou áudio enviadas pelo usuário."""
-    if update.message.chat_id not in MY_CHAT_ID:
+    if update.message.chat_id != MY_CHAT_ID:
         update.message.reply_text("Acesso não autorizado.")
         return
     
     if update.message.voice:
         try:
-            # Baixar e transcrever áudio
             file = context.bot.get_file(update.message.voice.file_id)
             with tempfile.NamedTemporaryFile(delete=True) as temp_audio:
                 file.download(out=temp_audio.name)
@@ -81,18 +75,10 @@ def handle_message(update: Update, context: CallbackContext) -> None:
         logger.error(f"Erro ao gerar resposta do OpenAI: {e}")
         update.message.reply_text("Erro ao gerar resposta. Tente novamente.")
 
-
-
-
-
-
-
 def main():
     """Inicializa o bot."""
     while True:
         try:
-            
-            
             app = Application.builder().token(TELEGRAM_API_KEY).build()
             app.add_handler(CommandHandler("start", start))
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
