@@ -174,55 +174,91 @@ def handle_message(update: Update, context: CallbackContext) -> None:
     
     if update.message.voice:
         try:
+            import os
             file = context.bot.get_file(update.message.voice.file_id)
-            with tempfile.NamedTemporaryFile(delete=True, suffix='.ogg') as temp_audio:
-                file.download(out=temp_audio.name)
-                temp_audio.flush()
+            temp_audio_path = None
+            
+            try:
+                # Cria um arquivo temporário permanente (não será excluído automaticamente)
+                temp_fd, temp_audio_path = tempfile.mkstemp(suffix='.ogg')
+                os.close(temp_fd)  # Fecha o descritor de arquivo
+                
+                # Baixa o arquivo de áudio para o arquivo temporário
+                file.download(out=temp_audio_path)
+                logger.info(f"Arquivo de áudio baixado para: {temp_audio_path}")
+                
+                # Verifica se o arquivo existe e tem tamanho
+                if os.path.exists(temp_audio_path) and os.path.getsize(temp_audio_path) > 0:
+                    logger.info(f"Arquivo de áudio existe e tem tamanho: {os.path.getsize(temp_audio_path)} bytes")
+                else:
+                    logger.error("Arquivo de áudio não existe ou está vazio")
+                    raise Exception("Arquivo de áudio inválido")
                 
                 logger.info("Transcrevendo áudio...")
-                # Verifica a versão da API OpenAI e usa o método apropriado
-                try:
-                    # Para versão 0.28.0 ou anterior
-                    with open(temp_audio.name, "rb") as audio_file:
-                        transcription = openai.Audio.transcribe(
-                            "whisper-1", 
-                            audio_file
-                        )
-                    user_message = transcription.get('text', '')
-                    logger.info(f"Transcrição bem-sucedida usando método antigo: {user_message[:30]}...")
-                except (AttributeError, TypeError) as e:
-                    logger.info(f"Tentando método alternativo de transcrição: {e}")
+                user_message = ""
+                transcription_success = False
+                
+                # Método 1: OpenAI API v0.28.0 (método antigo)
+                if not transcription_success:
                     try:
-                        # Para versões mais recentes da API
-                        with open(temp_audio.name, "rb") as audio_file:
-                            # Cria uma cópia temporária do arquivo para evitar problemas de seek
+                        with open(temp_audio_path, "rb") as audio_file:
+                            transcription = openai.Audio.transcribe(
+                                "whisper-1", 
+                                audio_file
+                            )
+                        user_message = transcription.get('text', '')
+                        logger.info(f"Transcrição bem-sucedida usando método antigo: {user_message[:30]}...")
+                        transcription_success = True
+                    except Exception as e:
+                        logger.info(f"Método 1 falhou: {e}")
+                
+                # Método 2: OpenAI API v1 (método novo)
+                if not transcription_success:
+                    try:
+                        # Lê o arquivo de áudio
+                        with open(temp_audio_path, "rb") as audio_file:
                             audio_data = audio_file.read()
                         
-                        # Usa o método mais recente da API
+                        # Cria um objeto BytesIO
                         import io
                         audio_bytes = io.BytesIO(audio_data)
-                        audio_bytes.name = "audio.ogg"  # Nome necessário para alguns clientes da API
+                        audio_bytes.name = "audio.ogg"
                         
-                        try:
-                            # Tenta o método da API v1
-                            transcription = openai.audio.transcriptions.create(
-                                model="whisper-1",
-                                file=audio_bytes
-                            )
-                            user_message = transcription.text if hasattr(transcription, 'text') else str(transcription)
-                            logger.info(f"Transcrição bem-sucedida usando método v1: {user_message[:30]}...")
-                        except Exception as e3:
-                            logger.info(f"Tentando método final de transcrição: {e3}")
-                            # Última tentativa - método mais básico
-                            import requests
-                            
-                            headers = {
-                                "Authorization": f"Bearer {OPENAI_API_KEY}"
-                            }
-                            
-                            audio_bytes.seek(0)  # Reinicia a posição do buffer
+                        # Tenta o método da API v1
+                        transcription = openai.audio.transcriptions.create(
+                            model="whisper-1",
+                            file=audio_bytes
+                        )
+                        user_message = transcription.text if hasattr(transcription, 'text') else str(transcription)
+                        logger.info(f"Transcrição bem-sucedida usando método v1: {user_message[:30]}...")
+                        transcription_success = True
+                    except Exception as e:
+                        logger.info(f"Método 2 falhou: {e}")
+                
+                # Método 3: Chamada direta à API REST
+                if not transcription_success:
+                    try:
+                        # Lê o arquivo de áudio novamente
+                        with open(temp_audio_path, "rb") as audio_file:
+                            audio_data = audio_file.read()
+                        
+                        import io
+                        audio_bytes = io.BytesIO(audio_data)
+                        
+                        headers = {
+                            "Authorization": f"Bearer {OPENAI_API_KEY}"
+                        }
+                        
+                        # Cria um novo arquivo temporário para o upload
+                        temp_upload_fd, temp_upload_path = tempfile.mkstemp(suffix='.ogg')
+                        os.close(temp_upload_fd)
+                        
+                        with open(temp_upload_path, 'wb') as f:
+                            f.write(audio_data)
+                        
+                        with open(temp_upload_path, 'rb') as f:
                             files = {
-                                "file": ("audio.ogg", audio_bytes, "audio/ogg")
+                                "file": ("audio.ogg", f, "audio/ogg")
                             }
                             data = {
                                 "model": "whisper-1"
@@ -234,17 +270,32 @@ def handle_message(update: Update, context: CallbackContext) -> None:
                                 files=files,
                                 data=data
                             )
-                            
-                            if response.status_code == 200:
-                                result = response.json()
-                                user_message = result.get("text", "")
-                                logger.info(f"Transcrição bem-sucedida usando requests: {user_message[:30]}...")
-                            else:
-                                logger.error(f"Erro na API: {response.status_code} - {response.text}")
-                                raise Exception(f"Erro na API: {response.status_code}")
-                    except Exception as e2:
-                        logger.error(f"Todos os métodos de transcrição falharam: {e2}")
-                        raise
+                        
+                        # Remove o arquivo temporário de upload
+                        if os.path.exists(temp_upload_path):
+                            os.remove(temp_upload_path)
+                        
+                        if response.status_code == 200:
+                            result = response.json()
+                            user_message = result.get("text", "")
+                            logger.info(f"Transcrição bem-sucedida usando requests: {user_message[:30]}...")
+                            transcription_success = True
+                        else:
+                            logger.error(f"Erro na API: {response.status_code} - {response.text}")
+                    except Exception as e:
+                        logger.info(f"Método 3 falhou: {e}")
+                
+                if not transcription_success:
+                    raise Exception("Todos os métodos de transcrição falharam")
+                
+            finally:
+                # Limpa o arquivo temporário
+                if temp_audio_path and os.path.exists(temp_audio_path):
+                    try:
+                        os.remove(temp_audio_path)
+                        logger.info(f"Arquivo temporário removido: {temp_audio_path}")
+                    except Exception as e:
+                        logger.error(f"Erro ao remover arquivo temporário: {e}")
                 
                 if not user_message:
                     update.message.reply_text("Erro: A transcrição do áudio retornou vazia.")
