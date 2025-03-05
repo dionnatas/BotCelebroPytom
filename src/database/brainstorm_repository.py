@@ -159,6 +159,32 @@ class BrainstormRepository:
         Returns:
             Dict[str, Any]: Dados do brainstorm ou None se não encontrado
         """
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            try:
+                logger.info(f"Obtendo brainstorm {brainstorm_id} no Supabase")
+                
+                # Construir a query
+                query = supabase_service.supabase.table("brainstorms").select("*")
+                
+                # Filtrar por id
+                query = query.eq("id", brainstorm_id)
+                
+                # Executar a query
+                response = query.execute()
+                
+                # Verificar se a consulta foi bem-sucedida e se retornou algum resultado
+                if response.data is not None and len(response.data) > 0:
+                    return response.data[0]
+                
+                logger.warning(f"Brainstorm com ID {brainstorm_id} não encontrado no Supabase")
+                return None
+                
+            except Exception as e:
+                logger.error(f"Erro ao obter brainstorm no Supabase: {e}", exc_info=True)
+                return None
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
@@ -179,10 +205,11 @@ class BrainstormRepository:
             if row:
                 return dict(row)
             else:
+                logger.warning(f"Brainstorm com ID {brainstorm_id} não encontrado no SQLite")
                 return None
         
         except Exception as e:
-            logger.error(f"Erro ao obter brainstorm: {str(e)}", exc_info=True)
+            logger.error(f"Erro ao obter brainstorm no SQLite: {str(e)}", exc_info=True)
             return None
     
     def atualizar_brainstorm(self, brainstorm_id: int, novo_conteudo: str) -> bool:
@@ -196,6 +223,39 @@ class BrainstormRepository:
         Returns:
             bool: True se o brainstorm foi atualizado com sucesso, False caso contrário
         """
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            try:
+                logger.info(f"Verificando se o brainstorm {brainstorm_id} existe no Supabase")
+                
+                # Verificar se o brainstorm existe
+                brainstorm = self.obter_brainstorm(brainstorm_id)
+                if not brainstorm:
+                    logger.warning(f"Brainstorm com ID {brainstorm_id} não encontrado no Supabase")
+                    return False
+                
+                # Preparar os dados para atualizar
+                dados = {
+                    "conteudo": novo_conteudo
+                    # Não usamos updated_at pois a coluna não existe na tabela
+                }
+                
+                # Atualizar o brainstorm no Supabase
+                response = supabase_service.supabase.table("brainstorms").update(dados).eq("id", brainstorm_id).execute()
+                
+                # Verificar se a atualização foi bem-sucedida
+                if response.data and len(response.data) > 0:
+                    logger.info(f"Brainstorm {brainstorm_id} atualizado com sucesso no Supabase")
+                    return True
+                
+                logger.error(f"Erro ao atualizar brainstorm no Supabase: {response.error}")
+                return False
+                
+            except Exception as e:
+                logger.error(f"Erro ao atualizar brainstorm no Supabase: {e}", exc_info=True)
+                return False
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -208,7 +268,7 @@ class BrainstormRepository:
             
             if not cursor.fetchone():
                 conn.close()
-                logger.warning(f"Brainstorm com ID {brainstorm_id} não encontrado")
+                logger.warning(f"Brainstorm com ID {brainstorm_id} não encontrado no SQLite")
                 return False
             
             # Obtém a data atual
@@ -223,11 +283,11 @@ class BrainstormRepository:
             conn.commit()
             conn.close()
             
-            logger.info(f"Brainstorm {brainstorm_id} atualizado com sucesso")
+            logger.info(f"Brainstorm {brainstorm_id} atualizado com sucesso no SQLite")
             return True
         
         except Exception as e:
-            logger.error(f"Erro ao atualizar brainstorm: {str(e)}", exc_info=True)
+            logger.error(f"Erro ao atualizar brainstorm no SQLite: {str(e)}", exc_info=True)
             return False
 
 # Instância global do repositório de brainstorms
