@@ -83,7 +83,7 @@ def main():
     while True:
         try:
             scheduler = AsyncIOScheduler(timezone=pytz.timezone('America/Sao_Paulo'))
-scheduler.start()
+            scheduler.start()
 app = Application.builder().token(TELEGRAM_API_KEY).build()
             app.add_handler(CommandHandler("start", start))
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
