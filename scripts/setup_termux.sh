@@ -18,7 +18,7 @@ pkg update -y && pkg upgrade -y
 
 # Instala dependências necessárias
 echo "Instalando dependências..."
-pkg install -y python ffmpeg libffi openssl
+pkg install -y python ffmpeg libffi openssl file coreutils
 
 # Instala as dependências Python
 echo "Instalando dependências Python..."
@@ -50,8 +50,46 @@ fi
 
 # Aplica correções específicas para o Termux
 echo "Aplicando correções para o Termux..."
-python3 scripts/fix_audio.py
+
+# Verifica se o ffmpeg está instalado corretamente
+if command -v ffmpeg >/dev/null 2>&1; then
+    echo "FFmpeg está instalado."
+    ffmpeg -version | head -n 1
+else
+    echo "AVISO: FFmpeg não encontrado. Tentando instalar novamente..."
+    pkg install -y ffmpeg
+    if command -v ffmpeg >/dev/null 2>&1; then
+        echo "FFmpeg instalado com sucesso."
+    else
+        echo "ERRO: Falha ao instalar FFmpeg. A conversão de áudio pode não funcionar."
+    fi
+fi
+
+# Verifica se o comando file está instalado corretamente
+if command -v file >/dev/null 2>&1; then
+    echo "Comando 'file' está instalado."
+    file --version | head -n 1
+else
+    echo "AVISO: Comando 'file' não encontrado. Tentando instalar novamente..."
+    pkg install -y file
+    if command -v file >/dev/null 2>&1; then
+        echo "Comando 'file' instalado com sucesso."
+    else
+        echo "ERRO: Falha ao instalar o comando 'file'. A verificação de formato de arquivos pode não funcionar."
+    fi
+fi
+
+# Cria diretório temporário se não existir
+if [ ! -d "$HOME/tmp" ]; then
+    echo "Criando diretório temporário em $HOME/tmp"
+    mkdir -p "$HOME/tmp"
+    echo "export TMPDIR=$HOME/tmp" >> "$HOME/.bashrc"
+    export TMPDIR=$HOME/tmp
+fi
+
+# Executa o script de correção de áudio para o Termux
+python3 scripts/fix_termux_audio.py
 
 echo "Configuração concluída!"
 echo "Para iniciar o bot, execute: ./scripts/run_background.sh"
-echo "Para verificar o status, execute: ./scripts/status_bot.sh"
+echo "Para verificar o status, execute: ./scripts/status_bot_termux.sh"
