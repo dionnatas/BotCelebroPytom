@@ -21,9 +21,13 @@ def check_authorization(update: Update) -> bool:
     chat_id = update.effective_chat.id
     authorized = False
     
-    # Verifica se é o chat do proprietário
-    if chat_id == MY_CHAT_ID:
-        authorized = True
+    # Verifica se é um chat autorizado
+    if isinstance(MY_CHAT_ID, list):
+        if chat_id in MY_CHAT_ID:
+            authorized = True
+    else:
+        if chat_id == MY_CHAT_ID:
+            authorized = True
     
     # Verifica se é um grupo autorizado
     # Adicione aqui lógica para verificar grupos autorizados se necessário
