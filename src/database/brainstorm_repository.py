@@ -6,7 +6,8 @@ import sqlite3
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-from src.config.settings import DB_PATH
+from src.config.settings import DB_PATH, USE_SUPABASE
+from src.database.supabase_service import supabase_service
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,32 @@ class BrainstormRepository:
         Returns:
             int: ID do brainstorm salvo ou None em caso de erro
         """
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            try:
+                # Preparar os dados para inserir
+                dados = {
+                    "ideia_id": ideia_id,
+                    "conteudo": conteudo
+                }
+                
+                # Inserir o brainstorm no Supabase
+                response = supabase_service.supabase.table("brainstorms").insert(dados).execute()
+                
+                # Verificar se a inserção foi bem-sucedida
+                if response.data and len(response.data) > 0:
+                    brainstorm_id = response.data[0].get("id")
+                    logger.info(f"Brainstorm salvo no Supabase com ID: {brainstorm_id}")
+                    return brainstorm_id
+                
+                logger.error(f"Erro ao salvar brainstorm no Supabase: {response.error}")
+                return None
+                
+            except Exception as e:
+                logger.error(f"Erro ao salvar brainstorm no Supabase: {e}", exc_info=True)
+                return None
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -54,11 +81,11 @@ class BrainstormRepository:
             conn.commit()
             conn.close()
             
-            logger.info(f"Brainstorm salvo com sucesso. ID: {brainstorm_id}")
+            logger.info(f"Brainstorm salvo com sucesso no SQLite. ID: {brainstorm_id}")
             return brainstorm_id
         
         except Exception as e:
-            logger.error(f"Erro ao salvar brainstorm: {str(e)}", exc_info=True)
+            logger.error(f"Erro ao salvar brainstorm no SQLite: {str(e)}", exc_info=True)
             return None
     
     def obter_brainstorms_por_ideia(self, ideia_id: int) -> List[Dict[str, Any]]:
@@ -71,6 +98,35 @@ class BrainstormRepository:
         Returns:
             List[Dict[str, Any]]: Lista de brainstorms
         """
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            try:
+                logger.info(f"Obtendo brainstorms para ideia {ideia_id} no Supabase")
+                
+                # Construir a query
+                query = supabase_service.supabase.table("brainstorms").select("*")
+                
+                # Filtrar por ideia_id
+                query = query.eq("ideia_id", ideia_id)
+                
+                # Ordenar por data de criação (decrescente)
+                query = query.order("created_at", desc=True)
+                
+                # Executar a query
+                response = query.execute()
+                
+                # Verificar se a consulta foi bem-sucedida
+                if response.data is not None:
+                    return response.data
+                
+                logger.error(f"Erro ao obter brainstorms no Supabase: {response.error}")
+                return []
+                
+            except Exception as e:
+                logger.error(f"Erro ao obter brainstorms no Supabase: {e}")
+                return []
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
@@ -90,7 +146,7 @@ class BrainstormRepository:
             return brainstorms
         
         except Exception as e:
-            logger.error(f"Erro ao obter brainstorms: {str(e)}", exc_info=True)
+            logger.error(f"Erro ao obter brainstorms no SQLite: {str(e)}", exc_info=True)
             return []
     
     def obter_brainstorm(self, brainstorm_id: int) -> Optional[Dict[str, Any]]:
