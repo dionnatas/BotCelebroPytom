@@ -3,6 +3,8 @@ import openai
 import secrets_cerebro
 import tempfile
 import time
+import os
+import tzdata
 
 
 from datetime import datetime
@@ -77,6 +79,9 @@ def handle_message(update: Update, context: CallbackContext) -> None:
     except Exception as e:
         logger.error(f"Erro ao gerar resposta do OpenAI: {e}")
         update.message.reply_text("Erro ao gerar resposta. Tente novamente.")
+
+os.environ['TZ'] = 'UTC'
+time.tzset()
 
 def main():
     """Inicializa o bot."""
