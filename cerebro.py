@@ -88,10 +88,9 @@ def handle_message(update: Update, context: CallbackContext) -> None:
 
             audio_file= open("download.ogg", "rb")
 
-            result = client.audio.transcriptions.create(
-            model="whisper-1", 
-            file=audio_file
-            )
+            result = openai.Audio.transcribe(
+    "whisper-1", audio_file
+)
 
             print(result)
 
