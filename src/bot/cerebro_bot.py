@@ -8,7 +8,8 @@ from typing import Dict, Any
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from src.config.settings import TELEGRAM_API_KEY
-from src.bot.handlers import start, handle_message, listar_ideias, ver_ideia, apagar_ideia, listar_comandos, refazer_brainstorm
+from src.bot.command_handlers import start, listar_ideias, ver_ideia, apagar_ideia, listar_comandos, refazer_brainstorm
+from src.bot.message_handlers import handle_message
 
 logger = logging.getLogger(__name__)
 

@@ -1,276 +1,125 @@
 """
 Gerenciador de banco de dados do bot Cerebro.
+Este módulo mantém compatibilidade com o código antigo, mas internamente
+usa os novos repositórios idea_repository e brainstorm_repository.
 """
 import logging
-import sqlite3
-from datetime import datetime
 from typing import Tuple, List, Dict, Any, Optional
 
-from src.config.settings import DB_PATH
+from src.database.idea_repository import idea_repository
+from src.database.brainstorm_repository import brainstorm_repository
 
 logger = logging.getLogger(__name__)
 
 class DatabaseManager:
     """
     Gerencia as operações de banco de dados para o bot Cerebro.
+    Esta classe mantém compatibilidade com o código antigo, mas internamente
+    usa os novos repositórios idea_repository e brainstorm_repository.
     """
     
     def __init__(self):
         """
         Inicializa o gerenciador de banco de dados.
         """
-        self.db_path = DB_PATH
-        self.init_db()
+        pass
     
     def init_db(self) -> None:
         """
         Inicializa o banco de dados SQLite.
+        Este método é mantido para compatibilidade, mas não faz nada.
         """
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Tabela de ideias
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS ideias (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    tipo TEXT NOT NULL,
-                    conteudo TEXT NOT NULL,
-                    resumo TEXT NOT NULL,
-                    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
-            # Tabela de brainstorms
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS brainstorms (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ideia_id INTEGER NOT NULL,
-                    conteudo TEXT NOT NULL,
-                    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (ideia_id) REFERENCES ideias (id)
-                )
-            ''')
-            
-            conn.commit()
-            logger.info("Banco de dados inicializado com sucesso.")
-        except sqlite3.Error as e:
-            logger.error(f"Erro ao inicializar o banco de dados: {e}")
-        finally:
-            if conn:
-                conn.close()
+        # Não faz nada, pois a inicialização é feita nos repositórios
+        pass
     
-    def salvar_ideia(self, tipo: str, conteudo: str, resumo: str) -> int:
+    def salvar_ideia(self, conteudo: str, chat_id: int) -> Optional[int]:
         """
-        Salva uma ideia no banco de dados.
+        Salva uma nova ideia no banco de dados.
         
         Args:
-            tipo: Tipo da ideia (IDEIA, QUESTAO, etc.)
-            conteudo: Conteúdo completo da ideia
-            resumo: Resumo da ideia
+            conteudo: Conteúdo da ideia
+            chat_id: ID do chat do usuário
             
         Returns:
-            int: ID da ideia salva
+            int: ID da ideia salva ou None em caso de erro
         """
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute(
-                "INSERT INTO ideias (tipo, conteudo, resumo, data_criacao) VALUES (?, ?, ?, ?)",
-                (tipo, conteudo, resumo, datetime.now())
-            )
-            
-            ideia_id = cursor.lastrowid
-            conn.commit()
-            logger.info(f"Ideia salva com ID: {ideia_id}")
-            return ideia_id
-        except sqlite3.Error as e:
-            logger.error(f"Erro ao salvar ideia: {e}")
-            return -1
-        finally:
-            if conn:
-                conn.close()
+        return idea_repository.salvar_ideia(conteudo, chat_id)
     
-    def salvar_brainstorm(self, ideia_id: int, conteudo: str) -> int:
+    def listar_ideias(self, chat_id: int) -> List[Dict[str, Any]]:
         """
-        Salva um brainstorm no banco de dados.
+        Lista todas as ideias de um usuário.
+        
+        Args:
+            chat_id: ID do chat do usuário
+            
+        Returns:
+            List[Dict[str, Any]]: Lista de ideias
+        """
+        return idea_repository.listar_ideias(chat_id)
+    
+    def obter_ideia(self, ideia_id: int, chat_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Obtém uma ideia específica pelo ID.
+        
+        Args:
+            ideia_id: ID da ideia
+            chat_id: ID do chat do usuário
+            
+        Returns:
+            Dict[str, Any]: Dados da ideia ou None se não encontrada
+        """
+        return idea_repository.obter_ideia(ideia_id, chat_id)
+    
+    def salvar_brainstorm(self, ideia_id: int, conteudo: str) -> Optional[int]:
+        """
+        Salva um novo brainstorm no banco de dados.
         
         Args:
             ideia_id: ID da ideia relacionada
             conteudo: Conteúdo do brainstorm
             
         Returns:
-            int: ID do brainstorm salvo
+            int: ID do brainstorm salvo ou None em caso de erro
         """
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute(
-                "INSERT INTO brainstorms (ideia_id, conteudo, data_criacao) VALUES (?, ?, ?)",
-                (ideia_id, conteudo, datetime.now())
-            )
-            
-            brainstorm_id = cursor.lastrowid
-            conn.commit()
-            logger.info(f"Brainstorm salvo com ID: {brainstorm_id}")
-            return brainstorm_id
-        except sqlite3.Error as e:
-            logger.error(f"Erro ao salvar brainstorm: {e}")
-            return -1
-        finally:
-            if conn:
-                conn.close()
+        return brainstorm_repository.salvar_brainstorm(ideia_id, conteudo)
     
-    def listar_ideias(self, limite: int = 10) -> List[Dict[str, Any]]:
+    def obter_brainstorms_por_ideia(self, ideia_id: int) -> List[Dict[str, Any]]:
         """
-        Lista as ideias salvas no banco de dados.
-        
-        Args:
-            limite: Número máximo de ideias a retornar
-            
-        Returns:
-            List[Dict]: Lista de ideias
-        """
-        try:
-            conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            
-            cursor.execute(
-                "SELECT id, tipo, resumo, data_criacao FROM ideias ORDER BY data_criacao DESC LIMIT ?",
-                (limite,)
-            )
-            
-            ideias = [dict(row) for row in cursor.fetchall()]
-            logger.info(f"Listadas {len(ideias)} ideias")
-            return ideias
-        except sqlite3.Error as e:
-            logger.error(f"Erro ao listar ideias: {e}")
-            return []
-        finally:
-            if conn:
-                conn.close()
-    
-    def obter_ideia(self, ideia_id: int) -> Optional[Dict[str, Any]]:
-        """
-        Obtém uma ideia específica pelo ID.
+        Obtém todos os brainstorms de uma ideia.
         
         Args:
             ideia_id: ID da ideia
             
         Returns:
-            Dict: Dados da ideia ou None se não encontrada
+            List[Dict[str, Any]]: Lista de brainstorms
         """
-        try:
-            conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
+        return brainstorm_repository.obter_brainstorms_por_ideia(ideia_id)
+    
+    def apagar_ideia(self, ideia_id: int, chat_id: int) -> bool:
+        """
+        Apaga uma ideia e seus brainstorms relacionados.
+        
+        Args:
+            ideia_id: ID da ideia
+            chat_id: ID do chat do usuário
             
-            cursor.execute(
-                "SELECT * FROM ideias WHERE id = ?",
-                (ideia_id,)
-            )
-            
-            ideia = cursor.fetchone()
-            if ideia:
-                ideia_dict = dict(ideia)
-                
-                # Obtém os brainstorms relacionados
-                cursor.execute(
-                    "SELECT * FROM brainstorms WHERE ideia_id = ? ORDER BY data_criacao DESC",
-                    (ideia_id,)
-                )
-                
-                brainstorms = [dict(row) for row in cursor.fetchall()]
-                ideia_dict['brainstorms'] = brainstorms
-                
-                logger.info(f"Ideia {ideia_id} obtida com sucesso")
-                return ideia_dict
-            else:
-                logger.warning(f"Ideia {ideia_id} não encontrada")
-                return None
-        except sqlite3.Error as e:
-            logger.error(f"Erro ao obter ideia {ideia_id}: {e}")
-            return None
-        finally:
-            if conn:
-                conn.close()
+        Returns:
+            bool: True se a ideia foi apagada com sucesso, False caso contrário
+        """
+        return idea_repository.apagar_ideia(ideia_id, chat_id)
     
     def atualizar_brainstorm(self, brainstorm_id: int, novo_conteudo: str) -> bool:
         """
         Atualiza o conteúdo de um brainstorm existente.
         
         Args:
-            brainstorm_id: ID do brainstorm a ser atualizado
+            brainstorm_id: ID do brainstorm
             novo_conteudo: Novo conteúdo do brainstorm
             
         Returns:
             bool: True se o brainstorm foi atualizado com sucesso, False caso contrário
         """
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Verifica se o brainstorm existe
-            cursor.execute("SELECT id FROM brainstorms WHERE id = ?", (brainstorm_id,))
-            if not cursor.fetchone():
-                logger.warning(f"Tentativa de atualizar brainstorm inexistente: {brainstorm_id}")
-                return False
-            
-            # Atualiza o brainstorm
-            cursor.execute(
-                "UPDATE brainstorms SET conteudo = ?, data_criacao = ? WHERE id = ?",
-                (novo_conteudo, datetime.now(), brainstorm_id)
-            )
-            
-            conn.commit()
-            logger.info(f"Brainstorm {brainstorm_id} atualizado com sucesso")
-            return True
-        except sqlite3.Error as e:
-            logger.error(f"Erro ao atualizar brainstorm {brainstorm_id}: {e}")
-            return False
-        finally:
-            if conn:
-                conn.close()
-    
-    def apagar_ideia(self, ideia_id: int) -> bool:
-        """
-        Apaga uma ideia e seus brainstorms relacionados do banco de dados.
-        
-        Args:
-            ideia_id: ID da ideia a ser apagada
-            
-        Returns:
-            bool: True se a ideia foi apagada com sucesso, False caso contrário
-        """
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Verifica se a ideia existe
-            cursor.execute("SELECT id FROM ideias WHERE id = ?", (ideia_id,))
-            if not cursor.fetchone():
-                logger.warning(f"Tentativa de apagar ideia inexistente: {ideia_id}")
-                return False
-            
-            # Apaga os brainstorms relacionados
-            cursor.execute("DELETE FROM brainstorms WHERE ideia_id = ?", (ideia_id,))
-            
-            # Apaga a ideia
-            cursor.execute("DELETE FROM ideias WHERE id = ?", (ideia_id,))
-            
-            conn.commit()
-            logger.info(f"Ideia {ideia_id} apagada com sucesso")
-            return True
-        except sqlite3.Error as e:
-            logger.error(f"Erro ao apagar ideia {ideia_id}: {e}")
-            return False
-        finally:
-            if conn:
-                conn.close()
-
+        return brainstorm_repository.atualizar_brainstorm(brainstorm_id, novo_conteudo)
 
 # Instância global do gerenciador de banco de dados
 db_manager = DatabaseManager()
