@@ -65,6 +65,9 @@ else:
 # Configurações do banco de dados
 DB_PATH = BASE_DIR / "var/db/cerebro.db"
 
+# Configuração para usar Supabase em vez do SQLite
+USE_SUPABASE = True  # Mude para False para usar o SQLite local
+
 # Configurações da OpenAI
 OPENAI_MODEL = "gpt-3.5-turbo"
 OPENAI_WHISPER_MODEL = "whisper-1"

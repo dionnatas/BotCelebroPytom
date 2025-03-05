@@ -6,7 +6,8 @@ import sqlite3
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-from src.config.settings import DB_PATH
+from src.config.settings import DB_PATH, USE_SUPABASE
+from src.database.supabase_service import supabase_service
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +38,18 @@ class IdeaRepository:
         Returns:
             int: ID da ideia salva ou None em caso de erro
         """
+        # Se o resumo estiver vazio, usa as primeiras 100 caracteres do conteúdo
+        if not resumo:
+            resumo = conteudo[:100] + "..." if len(conteudo) > 100 else conteudo
+            
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            return supabase_service.salvar_ideia(conteudo, chat_id, tipo, resumo)
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
-            
-            # Se o resumo estiver vazio, usa as primeiras 100 caracteres do conteúdo
-            if not resumo:
-                resumo = conteudo[:100] + "..." if len(conteudo) > 100 else conteudo
             
             # Obtém a data atual
             data_criacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -78,6 +84,11 @@ class IdeaRepository:
         Returns:
             List[Dict[str, Any]]: Lista de ideias
         """
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            return supabase_service.listar_ideias(chat_id, is_superuser)
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
@@ -137,27 +148,37 @@ class IdeaRepository:
             logger.error(f"Erro ao obter ideia por ID: {str(e)}", exc_info=True)
             return None
     
-    def obter_ideia(self, ideia_id: int, chat_id: int) -> Optional[Dict[str, Any]]:
+    def obter_ideia(self, ideia_id: int, chat_id: int, is_superuser: bool = False) -> Optional[Dict[str, Any]]:
         """
         Obtém uma ideia específica pelo ID.
         
         Args:
             ideia_id: ID da ideia
             chat_id: ID do chat do usuário
+            is_superuser: Se o usuário é um superusuário
             
         Returns:
             Dict[str, Any]: Dados da ideia ou None se não encontrada
         """
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            return supabase_service.obter_ideia(ideia_id, chat_id, is_superuser)
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             
-            # Busca a ideia pelo ID e chat_id
-            cursor.execute(
-                "SELECT * FROM ideias WHERE id = ? AND chat_id = ?",
-                (ideia_id, chat_id)
-            )
+            # Se for superusuário, busca a ideia apenas pelo ID
+            # Senão, busca pelo ID e chat_id
+            if is_superuser:
+                cursor.execute("SELECT * FROM ideias WHERE id = ?", (ideia_id,))
+            else:
+                cursor.execute(
+                    "SELECT * FROM ideias WHERE id = ? AND chat_id = ?",
+                    (ideia_id, chat_id)
+                )
             row = cursor.fetchone()
             
             conn.close()
@@ -171,26 +192,35 @@ class IdeaRepository:
             logger.error(f"Erro ao obter ideia: {str(e)}", exc_info=True)
             return None
     
-    def apagar_ideia(self, ideia_id: int, chat_id: int) -> bool:
+    def apagar_ideia(self, ideia_id: int, chat_id: int, is_superuser: bool = False) -> bool:
         """
         Apaga uma ideia e seus brainstorms relacionados.
         
         Args:
             ideia_id: ID da ideia
             chat_id: ID do chat do usuário
+            is_superuser: Se o usuário é um superusuário
             
         Returns:
             bool: True se a ideia foi apagada com sucesso, False caso contrário
         """
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            return supabase_service.apagar_ideia(ideia_id, chat_id, is_superuser)
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # Verifica se a ideia existe e pertence ao usuário
-            cursor.execute(
-                "SELECT id FROM ideias WHERE id = ? AND chat_id = ?",
-                (ideia_id, chat_id)
-            )
+            # Verifica se a ideia existe e pertence ao usuário (ou se é superusuário)
+            if is_superuser:
+                cursor.execute("SELECT id FROM ideias WHERE id = ?", (ideia_id,))
+            else:
+                cursor.execute(
+                    "SELECT id FROM ideias WHERE id = ? AND chat_id = ?",
+                    (ideia_id, chat_id)
+                )
             
             if not cursor.fetchone():
                 conn.close()
@@ -206,10 +236,13 @@ class IdeaRepository:
             )
             
             # Apaga a ideia
-            cursor.execute(
-                "DELETE FROM ideias WHERE id = ? AND chat_id = ?",
-                (ideia_id, chat_id)
-            )
+            if is_superuser:
+                cursor.execute("DELETE FROM ideias WHERE id = ?", (ideia_id,))
+            else:
+                cursor.execute(
+                    "DELETE FROM ideias WHERE id = ? AND chat_id = ?",
+                    (ideia_id, chat_id)
+                )
             
             # Confirma a transação
             conn.commit()
