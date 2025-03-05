@@ -96,6 +96,14 @@ Isso ativará o Cerebro na sua conta do Telegram, pronto para receber e processa
 - **Entrada de Texto**: Envie mensagens de texto para ideias rápidas ou comandos para gerenciar suas sessões de ideias.
 - **Sessões de Brainstorming**: Siga as instruções do bot para explorar e expandir suas ideias.
 
+### Comandos Disponíveis
+
+| Comando | Descrição |
+|---------|------------|
+| `/start` | Inicia a conversa com o bot e exibe uma mensagem de boas-vindas |
+| `/listar` | Lista as últimas 10 ideias salvas no banco de dados |
+| `/ver <id>` | Mostra os detalhes completos de uma ideia específica, incluindo brainstorms associados |
+
 ## Ideias para implementação futura
 
 - **Gestão de aniversários**: Sempre esqueço de algumas datas, gostaria de ajuda pra me lembrar e eventualmente escrever mensagens personalizadas

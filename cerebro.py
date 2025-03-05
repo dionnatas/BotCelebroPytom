@@ -401,20 +401,37 @@ def ver_ideia(update: Update, context: CallbackContext) -> None:
     brainstorms = cursor.fetchall()
     conn.close()
     
+    # Formata a data da ideia
     data = datetime.strptime(ideia[3], "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M")
+    
+    # Prepara a mensagem principal com os detalhes da ideia
     mensagem = f"*Ideia {ideia_id}*\n\n"
     mensagem += f"*Tipo:* {ideia[0]}\n"
     mensagem += f"*Resumo:* {ideia[2]}\n"
     mensagem += f"*Data:* {data}\n\n"
     mensagem += f"*Conteúdo:*\n{ideia[1]}\n\n"
     
+    # Envia a primeira mensagem com os detalhes da ideia
+    update.message.reply_text(mensagem, parse_mode=ParseMode.MARKDOWN)
+    
+    # Se houver brainstorms, envia cada um em uma mensagem separada
     if brainstorms:
-        mensagem += "*Brainstorms:*\n\n"
         for i, brainstorm in enumerate(brainstorms):
             data_bs = datetime.strptime(brainstorm[1], "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M")
-            mensagem += f"*Brainstorm {i+1}* - {data_bs}\n{brainstorm[0]}\n\n"
-    
-    update.message.reply_text(mensagem, parse_mode=ParseMode.MARKDOWN)
+            bs_mensagem = f"*Brainstorm {i+1} para Ideia {ideia_id}* - {data_bs}\n\n{brainstorm[0]}"
+            
+            # Divide a mensagem em partes se for muito grande
+            if len(bs_mensagem) > 4000:  # Limite do Telegram é ~4096 caracteres
+                partes = [bs_mensagem[i:i+4000] for i in range(0, len(bs_mensagem), 4000)]
+                for j, parte in enumerate(partes):
+                    # Adiciona cabeçalho para partes subsequentes
+                    if j > 0:
+                        parte = f"*Brainstorm {i+1} (continuação {j+1})* para Ideia {ideia_id}\n\n{parte}"
+                    update.message.reply_text(parte, parse_mode=ParseMode.MARKDOWN)
+            else:
+                update.message.reply_text(bs_mensagem, parse_mode=ParseMode.MARKDOWN)
+    else:
+        update.message.reply_text("Esta ideia não possui brainstorms associados.")
 
 def main():
     """Inicializa o bot."""
