@@ -54,10 +54,12 @@ def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(
         "Olá! Eu sou o Cerebro, seu assistente para capturar e organizar ideias.\n\n"
         "Você pode me enviar mensagens de texto ou áudio, e eu vou classificá-las e armazená-las.\n\n"
-        "Comandos disponíveis:\n"
-        "/start - Exibe esta mensagem de ajuda\n"
+        "Comandos principais:\n"
+        "/start - Exibe esta mensagem de boas-vindas\n"
+        "/comandos - Mostra a lista completa de comandos disponíveis\n"
         "/listar - Lista suas ideias salvas\n"
-        "/ver [id] - Mostra detalhes de uma ideia específica"
+        "/ver [id] - Mostra detalhes de uma ideia específica\n"
+        "/apagar [id] - Apaga uma ideia específica"
     )
 
 def process_message(update: Update, context: CallbackContext, message_text: str) -> None:
@@ -420,6 +422,37 @@ def confirmar_apagar_ideia(update: Update, context: CallbackContext) -> None:
     # Limpa os dados temporários
     if 'ideia_para_apagar' in context.user_data:
         del context.user_data['ideia_para_apagar']
+
+def listar_comandos(update: Update, context: CallbackContext) -> None:
+    """
+    Lista todos os comandos disponíveis no bot.
+    
+    Args:
+        update: Objeto Update do Telegram
+        context: Contexto do callback
+    """
+    if not check_authorization(update):
+        return
+    
+    comandos = [
+        ("/start", "Inicia o bot e exibe mensagem de boas-vindas"),
+        ("/listar", "Lista todas as suas ideias salvas"),
+        ("/ver ID", "Mostra os detalhes de uma ideia específica"),
+        ("/apagar ID", "Apaga uma ideia e seus brainstorms relacionados"),
+        ("/comandos", "Mostra esta lista de comandos disponíveis")
+    ]
+    
+    mensagem = "*Comandos disponíveis:*\n\n"
+    
+    for comando, descricao in comandos:
+        mensagem += f"{comando} - {descricao}\n"
+    
+    mensagem += "\n*Como usar:*\n"
+    mensagem += "• Envie uma mensagem de texto para registrar uma ideia\n"
+    mensagem += "• Envie uma mensagem de voz para transcrição automática\n"
+    mensagem += "• Após registrar uma ideia, o bot perguntará se você deseja fazer um brainstorm\n"
+    
+    update.message.reply_text(mensagem, parse_mode=ParseMode.MARKDOWN)
 
 def ver_ideia(update: Update, context: CallbackContext) -> None:
     """
