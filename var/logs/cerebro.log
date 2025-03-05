@@ -1,27 +1,17 @@
-2025-03-05 11:52:45,524 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
-2025-03-05 11:52:46,201 - src.database.db_manager - INFO - Banco de dados inicializado com sucesso.
-2025-03-05 11:52:46,327 - src.bot.cerebro_bot - INFO - Handlers registrados com sucesso
-2025-03-05 11:52:46,328 - src.bot.cerebro_bot - INFO - Bot Cerebro inicializado com sucesso
-2025-03-05 11:52:46,328 - __main__ - INFO - Iniciando o bot Cerebro...
-2025-03-05 11:52:46,328 - src.bot.cerebro_bot - INFO - Iniciando o bot...
-2025-03-05 11:52:46,328 - apscheduler.scheduler - INFO - Scheduler started
-2025-03-05 11:52:47,482 - src.bot.cerebro_bot - INFO - Bot iniciado com PID 77316
-2025-03-05 11:54:51,647 - src.database.db_manager - INFO - Listadas 8 ideias
-2025-03-05 11:55:01,257 - src.database.db_manager - INFO - Ideia 8 obtida com sucesso
-2025-03-05 11:55:08,987 - src.database.db_manager - INFO - Ideia 8 apagada com sucesso
-2025-03-05 11:55:14,485 - src.database.db_manager - INFO - Listadas 7 ideias
-2025-03-05 11:55:26,162 - src.database.db_manager - INFO - Ideia 5 obtida com sucesso
-2025-03-05 11:55:30,629 - src.database.db_manager - INFO - Ideia 5 apagada com sucesso
-2025-03-05 11:55:50,770 - src.database.db_manager - INFO - Ideia 3 obtida com sucesso
-2025-03-05 11:55:55,254 - src.database.db_manager - INFO - Listadas 6 ideias
-2025-03-05 11:56:08,418 - src.database.db_manager - INFO - Ideia 7 obtida com sucesso
-2025-03-05 11:56:12,477 - src.database.db_manager - INFO - Ideia 7 apagada com sucesso
-2025-03-05 11:56:21,383 - src.database.db_manager - INFO - Ideia 4 obtida com sucesso
-2025-03-05 11:56:24,459 - src.database.db_manager - INFO - Ideia 4 apagada com sucesso
-2025-03-05 11:56:28,919 - src.database.db_manager - INFO - Listadas 4 ideias
-2025-03-05 11:56:40,208 - src.database.db_manager - INFO - Ideia 6 obtida com sucesso
-2025-03-05 11:56:44,272 - src.database.db_manager - INFO - Ideia 6 apagada com sucesso
-2025-03-05 11:56:59,271 - src.database.db_manager - WARNING - Ideia 6 não encontrada
-2025-03-05 11:57:18,949 - src.database.db_manager - INFO - Ideia 3 obtida com sucesso
-2025-03-05 11:57:23,361 - src.database.db_manager - INFO - Ideia 3 apagada com sucesso
-2025-03-05 11:57:30,411 - src.database.db_manager - INFO - Listadas 2 ideias
+2025-03-05 12:09:18,548 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
+2025-03-05 12:09:18,767 - src.database.db_manager - INFO - Banco de dados inicializado com sucesso.
+2025-03-05 12:09:18,877 - src.bot.cerebro_bot - INFO - Handlers registrados com sucesso
+2025-03-05 12:09:18,877 - src.bot.cerebro_bot - INFO - Bot Cerebro inicializado com sucesso
+2025-03-05 12:09:18,877 - __main__ - INFO - Iniciando o bot Cerebro...
+2025-03-05 12:09:18,877 - src.bot.cerebro_bot - INFO - Iniciando o bot...
+2025-03-05 12:09:18,877 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-05 12:09:20,136 - src.bot.cerebro_bot - INFO - Bot iniciado com PID 80925
+2025-03-05 12:14:46,775 - telegram.ext.updater - INFO - Received signal 15 (SIGTERM), stopping...
+2025-03-05 12:14:46,776 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-03-05 12:14:51,531 - __main__ - INFO - Bot finalizado
+2025-03-05 14:07:11,861 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
+2025-03-05 14:07:12,025 - __main__ - INFO - Handlers registrados com sucesso
+2025-03-05 14:07:12,025 - __main__ - INFO - Bot Cerebro inicializado com sucesso
+2025-03-05 14:09:36,257 - src.config.settings - INFO - OPENAI_API_KEY está definida e tem 164 caracteres
+2025-03-05 14:09:36,365 - __main__ - INFO - Handlers registrados com sucesso
+2025-03-05 14:09:36,365 - __main__ - INFO - Bot Cerebro inicializado com sucesso
