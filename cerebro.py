@@ -86,7 +86,10 @@ def main():
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
             
             logger.info("Bot iniciado com sucesso!")
-            asyncio.run(app.run_polling())
+            import asyncio
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+loop.run_until_complete(app.run_polling())
         except Exception as e:
             logger.error(f"Erro na conexão: {e}. Tentando reconectar em 1 segundo...")
             time.sleep(1)  # Espera 1 segundo antes de tentar novamente
