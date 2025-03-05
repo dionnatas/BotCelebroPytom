@@ -82,7 +82,7 @@ def main():
     """Inicializa o bot."""
     while True:
         try:
-            scheduler = AsyncIOScheduler(timezone=pytz.timezone('America/Sao_Paulo'))
+            scheduler = AsyncIOScheduler()
             scheduler.start()
             app = Application.builder().token(TELEGRAM_API_KEY).build()
             app.add_handler(CommandHandler("start", start))
