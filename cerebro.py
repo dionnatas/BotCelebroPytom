@@ -85,7 +85,6 @@ time.tzset()
 
 
 
-configure_timezone()
 
 def main():
     """Inicializa o bot."""
