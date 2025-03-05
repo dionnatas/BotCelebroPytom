@@ -7,7 +7,7 @@ from typing import Optional, List, Dict, Any
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
-from src.bot.bot_utils import check_authorization
+from src.bot.bot_utils import check_authorization, is_superuser
 from src.database.idea_repository import idea_repository
 from src.database.brainstorm_repository import brainstorm_repository
 from src.services.openai_service import openai_service
@@ -51,21 +51,29 @@ def listar_ideias(update: Update, context: CallbackContext) -> None:
         return
     
     chat_id = update.effective_chat.id
-    ideias = idea_repository.listar_ideias(chat_id)
+    superuser = is_superuser(chat_id)
+    ideias = idea_repository.listar_ideias(chat_id, superuser)
     
     if not ideias:
         update.message.reply_text("Você ainda não tem ideias salvas. Envie uma mensagem com sua ideia para começar!")
         return
     
     # Formata a lista de ideias
-    mensagem = "📋 *Suas ideias salvas:*\n\n"
+    if superuser:
+        mensagem = "📋 *Todas as ideias no sistema:*\n\n"
+    else:
+        mensagem = "📋 *Suas ideias salvas:*\n\n"
     for ideia in ideias:
         # Limita o tamanho da descrição para a listagem
         descricao = ideia['conteudo']
         if len(descricao) > 50:
             descricao = descricao[:47] + "..."
         
-        mensagem += f"*ID {ideia['id']}:* {descricao}\n"
+        # Para superusuários, mostra também o chat_id do autor
+        if superuser and 'chat_id' in ideia and ideia['chat_id'] != chat_id:
+            mensagem += f"*ID {ideia['id']}* (Autor: {ideia['chat_id']}): {descricao}\n"
+        else:
+            mensagem += f"*ID {ideia['id']}:* {descricao}\n"
     
     mensagem += "\nUse /ver [id] para ver os detalhes de uma ideia específica."
     
@@ -96,10 +104,19 @@ def ver_ideia(update: Update, context: CallbackContext) -> None:
     
     # Busca a ideia no banco de dados
     chat_id = update.effective_chat.id
-    ideia = idea_repository.obter_ideia(ideia_id, chat_id)
+    superuser = is_superuser(chat_id)
+    
+    # Se for superusuário, pode ver ideias de qualquer usuário
+    if superuser:
+        ideia = idea_repository.obter_ideia_por_id(ideia_id)
+    else:
+        ideia = idea_repository.obter_ideia(ideia_id, chat_id)
     
     if not ideia:
-        update.message.reply_text(f"Ideia com ID {ideia_id} não encontrada ou não pertence a você.")
+        if superuser:
+            update.message.reply_text(f"Ideia com ID {ideia_id} não encontrada no sistema.")
+        else:
+            update.message.reply_text(f"Ideia com ID {ideia_id} não encontrada ou não pertence a você.")
         return
     
     # Busca os brainstorms relacionados

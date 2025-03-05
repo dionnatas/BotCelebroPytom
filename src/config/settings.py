@@ -11,12 +11,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(BASE_DIR))
 
 try:
-    from secrets_cerebro import TELEGRAM_API_KEY, OPENAI_API_KEY, MY_CHAT_ID
+    from secrets_cerebro import TELEGRAM_API_KEY, OPENAI_API_KEY, MY_CHAT_ID, SUPERUSERS_CHAT_ID
 except ImportError:
     logging.error("Arquivo secrets_cerebro.py não encontrado ou não contém as chaves necessárias.")
     TELEGRAM_API_KEY = os.environ.get("TELEGRAM_API_KEY", "")
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
     MY_CHAT_ID = os.environ.get("MY_CHAT_ID", "")
+    SUPERUSERS_CHAT_ID = os.environ.get("SUPERUSERS_CHAT_ID", "")
 
 # Diretórios para arquivos de dados
 VAR_DIR = BASE_DIR / "var"

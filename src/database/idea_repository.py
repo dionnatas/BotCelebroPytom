@@ -61,12 +61,13 @@ class IdeaRepository:
             logger.error(f"Erro ao salvar ideia: {str(e)}", exc_info=True)
             return None
     
-    def listar_ideias(self, chat_id: int) -> List[Dict[str, Any]]:
+    def listar_ideias(self, chat_id: int, is_superuser: bool = False) -> List[Dict[str, Any]]:
         """
-        Lista todas as ideias de um usuário.
+        Lista ideias do banco de dados.
         
         Args:
             chat_id: ID do chat do usuário
+            is_superuser: Se True, lista todas as ideias do banco de dados
             
         Returns:
             List[Dict[str, Any]]: Lista de ideias
@@ -76,11 +77,17 @@ class IdeaRepository:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             
-            # Busca as ideias do usuário
-            cursor.execute(
-                "SELECT * FROM ideias WHERE chat_id = ? ORDER BY id DESC",
-                (chat_id,)
-            )
+            # Se for superusuário, busca todas as ideias
+            # Senão, busca apenas as ideias do usuário
+            if is_superuser:
+                cursor.execute(
+                    "SELECT id, tipo, conteudo, resumo, data_criacao, chat_id FROM ideias ORDER BY id DESC"
+                )
+            else:
+                cursor.execute(
+                    "SELECT * FROM ideias WHERE chat_id = ? ORDER BY id DESC",
+                    (chat_id,)
+                )
             
             # Converte os resultados para dicionários
             ideias = [dict(row) for row in cursor.fetchall()]
@@ -92,6 +99,37 @@ class IdeaRepository:
         except Exception as e:
             logger.error(f"Erro ao listar ideias: {str(e)}", exc_info=True)
             return []
+    
+    def obter_ideia_por_id(self, ideia_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Obtém uma ideia específica pelo ID, sem verificar o chat_id.
+        Esta função deve ser usada apenas por superusuários.
+        
+        Args:
+            ideia_id: ID da ideia
+            
+        Returns:
+            Dict[str, Any]: Dados da ideia ou None se não encontrada
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            # Busca a ideia pelo ID
+            cursor.execute("SELECT * FROM ideias WHERE id = ?", (ideia_id,))
+            row = cursor.fetchone()
+            
+            conn.close()
+            
+            if row:
+                return dict(row)
+            else:
+                return None
+                
+        except Exception as e:
+            logger.error(f"Erro ao obter ideia por ID: {str(e)}", exc_info=True)
+            return None
     
     def obter_ideia(self, ideia_id: int, chat_id: int) -> Optional[Dict[str, Any]]:
         """
