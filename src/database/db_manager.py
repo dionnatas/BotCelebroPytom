@@ -197,6 +197,42 @@ class DatabaseManager:
         finally:
             if conn:
                 conn.close()
+    
+    def apagar_ideia(self, ideia_id: int) -> bool:
+        """
+        Apaga uma ideia e seus brainstorms relacionados do banco de dados.
+        
+        Args:
+            ideia_id: ID da ideia a ser apagada
+            
+        Returns:
+            bool: True se a ideia foi apagada com sucesso, False caso contrário
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Verifica se a ideia existe
+            cursor.execute("SELECT id FROM ideias WHERE id = ?", (ideia_id,))
+            if not cursor.fetchone():
+                logger.warning(f"Tentativa de apagar ideia inexistente: {ideia_id}")
+                return False
+            
+            # Apaga os brainstorms relacionados
+            cursor.execute("DELETE FROM brainstorms WHERE ideia_id = ?", (ideia_id,))
+            
+            # Apaga a ideia
+            cursor.execute("DELETE FROM ideias WHERE id = ?", (ideia_id,))
+            
+            conn.commit()
+            logger.info(f"Ideia {ideia_id} apagada com sucesso")
+            return True
+        except sqlite3.Error as e:
+            logger.error(f"Erro ao apagar ideia {ideia_id}: {e}")
+            return False
+        finally:
+            if conn:
+                conn.close()
 
 
 # Instância global do gerenciador de banco de dados

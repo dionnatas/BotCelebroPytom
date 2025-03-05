@@ -104,6 +104,11 @@ def handle_message(update: Update, context: CallbackContext) -> None:
     if not check_authorization(update):
         return
     
+    # Verifica se estamos aguardando confirmação para apagar uma ideia
+    if 'ideia_para_apagar' in context.user_data and update.message.text:
+        confirmar_apagar_ideia(update, context)
+        return
+    
     # Verifica se a mensagem é uma resposta a um brainstorm
     if 'ultima_ideia' in context.user_data and update.message.text:
         resposta = update.message.text.lower()
@@ -345,6 +350,76 @@ def listar_ideias(update: Update, context: CallbackContext) -> None:
     mensagem += "\nPara ver detalhes de uma ideia, use o comando /ver seguido do ID."
     
     update.message.reply_text(mensagem, parse_mode=ParseMode.MARKDOWN)
+
+def apagar_ideia(update: Update, context: CallbackContext) -> None:
+    """
+    Apaga uma ideia e seus brainstorms relacionados.
+    
+    Args:
+        update: Objeto Update do Telegram
+        context: Contexto do callback
+    """
+    if not check_authorization(update):
+        return
+    
+    # Verifica se foi fornecido um ID
+    if not context.args or not context.args[0].isdigit():
+        update.message.reply_text(
+            "Por favor, forneça o ID da ideia que deseja apagar.\n"
+            "Exemplo: /apagar 123"
+        )
+        return
+    
+    ideia_id = int(context.args[0])
+    
+    # Obtém a ideia para confirmar antes de apagar
+    ideia = db_manager.obter_ideia(ideia_id)
+    if not ideia:
+        update.message.reply_text(f"Ideia com ID {ideia_id} não encontrada.")
+        return
+    
+    # Pede confirmação antes de apagar
+    context.user_data['ideia_para_apagar'] = ideia_id
+    
+    update.message.reply_text(
+        f"Você está prestes a apagar a ideia:\n\n"
+        f"*{ideia['resumo']}*\n\n"
+        f"Esta ação não pode ser desfeita. Para confirmar, responda com 'confirmar'.\n"
+        f"Para cancelar, responda com qualquer outra mensagem.",
+        parse_mode=ParseMode.MARKDOWN
+    )
+    
+    # Registra o próximo handler para processar a confirmação
+    return 'AGUARDANDO_CONFIRMACAO'
+
+def confirmar_apagar_ideia(update: Update, context: CallbackContext) -> None:
+    """
+    Confirma a exclusão de uma ideia após o usuário confirmar.
+    
+    Args:
+        update: Objeto Update do Telegram
+        context: Contexto do callback
+    """
+    if 'ideia_para_apagar' not in context.user_data:
+        update.message.reply_text("Nenhuma ideia selecionada para apagar.")
+        return
+    
+    resposta = update.message.text.lower().strip()
+    
+    if resposta == 'confirmar':
+        ideia_id = context.user_data['ideia_para_apagar']
+        sucesso = db_manager.apagar_ideia(ideia_id)
+        
+        if sucesso:
+            update.message.reply_text(f"✅ Ideia {ideia_id} apagada com sucesso!")
+        else:
+            update.message.reply_text(f"❌ Erro ao apagar a ideia {ideia_id}. Tente novamente mais tarde.")
+    else:
+        update.message.reply_text("Operação cancelada. A ideia não foi apagada.")
+    
+    # Limpa os dados temporários
+    if 'ideia_para_apagar' in context.user_data:
+        del context.user_data['ideia_para_apagar']
 
 def ver_ideia(update: Update, context: CallbackContext) -> None:
     """

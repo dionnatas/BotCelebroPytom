@@ -8,7 +8,7 @@ from typing import Dict, Any
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from src.config.settings import TELEGRAM_API_KEY
-from src.bot.handlers import start, handle_message, listar_ideias, ver_ideia
+from src.bot.handlers import start, handle_message, listar_ideias, ver_ideia, apagar_ideia
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,7 @@ class CerebroBot:
         self.dispatcher.add_handler(CommandHandler("start", start))
         self.dispatcher.add_handler(CommandHandler("listar", listar_ideias))
         self.dispatcher.add_handler(CommandHandler("ver", ver_ideia))
+        self.dispatcher.add_handler(CommandHandler("apagar", apagar_ideia))
         
         # Handler para mensagens de texto e áudio
         self.dispatcher.add_handler(MessageHandler(
