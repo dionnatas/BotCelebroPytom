@@ -75,6 +75,8 @@ def handle_message(update: Update, context: CallbackContext) -> None:
         logger.error(f"Erro ao gerar resposta do OpenAI: {e}")
         update.message.reply_text("Erro ao gerar resposta. Tente novamente.")
 
+import asyncio
+
 def main():
     """Inicializa o bot."""
     while True:
@@ -84,7 +86,7 @@ def main():
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
             
             logger.info("Bot iniciado com sucesso!")
-            app.run_polling()
+            asyncio.run(app.run_polling())
         except Exception as e:
             logger.error(f"Erro na conexão: {e}. Tentando reconectar em 1 segundo...")
             time.sleep(1)  # Espera 1 segundo antes de tentar novamente
