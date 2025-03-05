@@ -431,7 +431,9 @@ def main():
     dispatcher.add_handler(CommandHandler("ver", ver_ideia))
     
     # Adiciona handler para respostas de brainstorm
-    dispatcher.add_handler(MessageHandler(Filters.text & (Filters.regex('^(sim|s|yes|y|não|nao|n|no)$', re.IGNORECASE)), handle_brainstorm_response))
+    # Cria um padrão regex com flag de case insensitive
+    pattern = re.compile('^(sim|s|yes|y|não|nao|n|no)$', re.IGNORECASE)
+    dispatcher.add_handler(MessageHandler(Filters.text & (Filters.regex(pattern)), handle_brainstorm_response))
     
     # Adiciona handler para mensagens gerais
     dispatcher.add_handler(MessageHandler(Filters.text | Filters.voice, handle_message))
