@@ -81,7 +81,7 @@ def main():
     """Inicializa o bot."""
     while True:
         try:
-            app = Application.builder().token(TELEGRAM_API_KEY).local_timezone(pytz.timezone('America/Sao_Paulo')).build()
+            app = Application.builder().token(TELEGRAM_API_KEY).build()
             app.add_handler(CommandHandler("start", start))
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
             
