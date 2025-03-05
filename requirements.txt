@@ -1,4 +1,8 @@
+# Dependências principais
 openai==0.28.0
 python-telegram-bot==13.12
-requests==2.30.0
-urllib3==1.26.15
+requests>=2.30.0
+urllib3>=1.26.15
+
+# Dependências opcionais para compatibilidade
+python-dotenv>=0.19.0

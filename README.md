@@ -20,8 +20,9 @@ Principais Características já implementadas:
 
 ### Pré-requisitos
 
-- Python 3.10.7 (se você tiver outra versão instalada, instale essa e selecione essa versão para o ambiente virtual)
+- Python 3.9+ (testado com Python 3.9.6 e 3.10.7)
 - Uma conta no Telegram
+- Chaves de API para OpenAI e Telegram Bot
 
 ### Configuração
 
@@ -40,12 +41,11 @@ Segue como arquivos devem estar apresentados no diretório do projeto:
 
 3. **Configure o Ambiente Python (Opcional, mas recomendado)**: Use um ambiente virtual para evitar conflitos com outros projetos.
 
-Windows:
+#### Windows:
 
 No prompt de comando ou no terminal do vscode.
 
 Crie o ambiente virtual:
-
 
 Se você tiver várias versões do Python, use o seguinte comando (substitua USERNAME pelo seu usuário):
 ```sh
@@ -101,6 +101,94 @@ Isso ativará o Cerebro na sua conta do Telegram, pronto para receber e processa
 - **Gestão de aniversários**: Sempre esqueço de algumas datas, gostaria de ajuda pra me lembrar e eventualmente escrever mensagens personalizadas
 - **Adicionar elementos às ideias existentes**: Permitir ao usuário complementar elementos às ideias existentes
 - **Incorporar agentes (crewAI) para realização de tarefas específicas**
+
+## Execução no Termux (Android)
+
+Você pode executar o Cerebro diretamente no seu celular Android usando o Termux. Isso permite que você mantenha o bot funcionando no seu dispositivo móvel.
+
+### Instalação do Termux
+
+1. Instale o Termux pela [F-Droid](https://f-droid.org/en/packages/com.termux/) (recomendado) ou pela Google Play Store.
+2. Abra o Termux e execute os seguintes comandos:
+
+```sh
+# Atualizar pacotes
+pkg update -y && pkg upgrade -y
+
+# Instalar dependências necessárias
+pkg install -y python git clang libffi openssl
+
+# Clonar o repositório (ou copie os arquivos manualmente)
+git clone https://github.com/seu-usuario/BotCelebroPytom.git
+cd BotCelebroPytom
+
+# Dar permissão de execução ao script de configuração
+chmod +x setup_termux.sh
+
+# Executar o script de configuração
+./setup_termux.sh
+```
+
+### Configurando as chaves de API
+
+Certifique-se de configurar corretamente o arquivo `secrets_cerebro.py` com suas chaves de API:
+
+```python
+# secrets_cerebro.py
+TELEGRAM_API_KEY = "sua_chave_telegram_aqui"
+OPENAI_API_KEY = "sua_chave_openai_aqui"
+MY_CHAT_ID = "seu_chat_id_aqui"  # ou ["id1", "id2"] para múltiplos IDs
+```
+
+### Executando o bot
+
+Você tem várias opções para executar o bot no Termux:
+
+#### 1. Usando os scripts prontos
+
+O projeto inclui três scripts para facilitar a execução no Termux:
+
+- `setup_termux.sh`: Configura o ambiente, instala dependências e verifica a configuração.
+- `run_termux.sh`: Executa o bot no modo normal (terminal ativo).
+- `run_background.sh`: Executa o bot em segundo plano, permitindo fechar o Termux.
+
+Para usar os scripts:
+
+```sh
+# Dê permissão de execução aos scripts (apenas uma vez)
+chmod +x setup_termux.sh run_termux.sh run_background.sh
+
+# Configure o ambiente
+./setup_termux.sh
+
+# Execute o bot normalmente
+./run_termux.sh
+
+# OU execute em segundo plano
+./run_background.sh
+```
+
+#### 2. Executando manualmente
+
+Se preferir, você pode executar o bot manualmente:
+
+```sh
+# Execução normal
+python cerebro.py
+
+# Execução em segundo plano
+nohup python cerebro.py > cerebro.log 2>&1 &
+```
+
+#### 3. Corrigindo problemas de compatibilidade
+
+Se encontrar problemas de compatibilidade, execute o script de correção:
+
+```sh
+python fix_termux.py
+```
+
+Este script corrige problemas comuns, como a importação do `ParseMode`.
 
 ## Contribuindo
 

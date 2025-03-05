@@ -7,7 +7,21 @@ import json
 import sqlite3
 import requests
 from datetime import datetime
-from telegram import Update, ParseMode
+from telegram import Update
+
+# Compatibilidade com diferentes versões da biblioteca python-telegram-bot
+try:
+    from telegram import ParseMode
+except ImportError:
+    # Para versões mais recentes da biblioteca
+    from telegram.constants import ParseMode
+except ImportError:
+    # Fallback se não conseguir importar de nenhum lugar
+    class ParseMode:
+        HTML = "HTML"
+        MARKDOWN = "Markdown"
+        MARKDOWN_V2 = "MarkdownV2"
+
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from prompts import prompt_classificador, prompt_brainstorm
 
