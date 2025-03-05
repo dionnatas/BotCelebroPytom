@@ -47,7 +47,8 @@ if OPENAI_API_KEY is None:
     print("OPENAI_API_KEY not found. Please set it in the secrets_cerebro.py file")
 else:
     # client = openai.OpenAI()
-    openai.api_key = OPENAI_API_KEY    
+    openai.api_key = OPENAI_API_KEY
+    client = openai
 
 # Database setup
 DB_FILE = os.getcwd() + "/cerebro.db"
