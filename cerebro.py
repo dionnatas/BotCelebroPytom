@@ -3,8 +3,8 @@ import openai
 import secrets_cerebro
 import tempfile
 import time
-import pytz
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+
 from datetime import datetime
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
@@ -82,8 +82,8 @@ def main():
     """Inicializa o bot."""
     while True:
         try:
-            scheduler = AsyncIOScheduler(timezone='UTC')
-            scheduler.start()
+            
+            
             app = Application.builder().token(TELEGRAM_API_KEY).build()
             app.add_handler(CommandHandler("start", start))
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
