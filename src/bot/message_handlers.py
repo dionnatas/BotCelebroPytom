@@ -43,10 +43,14 @@ def process_message(update: Update, context: CallbackContext, message_text: str)
     
     logger.info(f"Mensagem classificada: {classificacao} | Categoria: {categoria} | Ação: {acao}")
     
-    if classificacao == "ideia":
+    if classificacao.upper() == "IDEIA":
         # Salva a ideia no banco de dados
         chat_id = update.effective_chat.id
-        ideia_id = idea_repository.salvar_ideia(message_text, chat_id)
+        
+        # Usa o tipo, categoria e ação para salvar a ideia
+        tipo = classificacao.lower()
+        resumo = categoria
+        ideia_id = idea_repository.salvar_ideia(message_text, chat_id, tipo, resumo)
         
         if ideia_id:
             # Pergunta se o usuário quer um brainstorm
