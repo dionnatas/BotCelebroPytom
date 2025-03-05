@@ -128,6 +128,17 @@ class IdeaRepository:
         Returns:
             Dict[str, Any]: Dados da ideia ou None se não encontrada
         """
+        # Verifica se deve usar o Supabase
+        if USE_SUPABASE:
+            try:
+                # Para superusuários, podemos usar qualquer chat_id, pois não será verificado
+                # is_superuser=True garante que apenas o ID será usado na consulta
+                return supabase_service.obter_ideia(ideia_id, 0, True)
+            except Exception as e:
+                logger.error(f"Erro ao obter ideia por ID no Supabase: {str(e)}", exc_info=True)
+                return None
+        
+        # Caso contrário, usa o SQLite
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
@@ -145,7 +156,7 @@ class IdeaRepository:
                 return None
                 
         except Exception as e:
-            logger.error(f"Erro ao obter ideia por ID: {str(e)}", exc_info=True)
+            logger.error(f"Erro ao obter ideia por ID no SQLite: {str(e)}", exc_info=True)
             return None
     
     def obter_ideia(self, ideia_id: int, chat_id: int, is_superuser: bool = False) -> Optional[Dict[str, Any]]:
