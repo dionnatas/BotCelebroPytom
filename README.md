@@ -4,16 +4,16 @@
 
 # Cerebro - Bot Telegram
 
-Cerebro é um bot do Telegram que tem o objetivo de ser seu segundo cérebro por meio do processamento de linguagem natural e inteligência artificial. Ele utiliza a LLMs para interpretar entradas de voz e texto, facilitando uma experiência única para alavancar seu potencial. Ideal para criadores, escritores e qualquer pessoa que deseje explorar e expandir suas ideias, o Cérebro atua como um parceiro usando ferramenta de inteligência artificial.
+Cerebro é um bot do Telegram que tem o objetivo de ser seu segundo cérebro por meio do processamento de linguagem natural e inteligência artificial. Ele utiliza LLMs para interpretar entradas de voz e texto, facilitando uma experiência única para alavancar seu potencial. Ideal para criadores, escritores e qualquer pessoa que deseje explorar e expandir suas ideias, o Cérebro atua como um parceiro usando ferramentas de inteligência artificial.
 
 ## Descrição
-
 
 Principais Características já implementadas:
 - Processamento de entradas de voz e texto
 - Identificação e categorização de ideias
 - Sessão de brainstorming automatizada com base nas ideias identificadas
-- Armazenamento persistente de ideias e sessões para referência futura
+- Armazenamento persistente de ideias e sessões no Supabase (banco de dados PostgreSQL na nuvem)
+- Backup local em SQLite como alternativa
 - Modelo de interação flexível, apoiando tanto a exploração imediata quanto adiada das ideias
 
 ## Instalação
@@ -23,12 +23,13 @@ Principais Características já implementadas:
 - Python 3.9+ (testado com Python 3.9.6 e 3.10.7)
 - Uma conta no Telegram
 - Chaves de API para OpenAI e Telegram Bot
+- Conta no Supabase (opcional, pode usar SQLite local)
 
 ### Configuração
 
 1. **Copie os arquivos do projeto**: Baixe os arquivos projeto para sua máquina local e salve em uma pasta ou faça o clone do repositório do GitHub usando o comando `git clone`.
 ```sh
-git clone https://github.com/mumunha/cerebro.git
+git clone https://github.com/dionnatas/BotCelebroPytom.git
 ```
 
 2. **Navegue até o Diretório do Projeto**
@@ -78,7 +79,7 @@ pip install -r requirements.txt
 
 3. **Obtenha o Token da API**: Após a criação bem-sucedida, o BotFather fornecerá um token da API para o seu novo bot. Esse token permite que seu bot se comunique com a API do Telegram.
 
-4. **Configuração de APIs**: Renomeie `secrets_cerebro.py.example` para `secrets_cerebro.py` e preencha-o com suas chaves de API do Telegram e OpenAI conforme necessário.
+4. **Configuração de APIs**: Renomeie `secrets_cerebro.py.example` para `secrets_cerebro.py` e preencha-o com suas chaves de API do Telegram, OpenAI e Supabase (se estiver usando) conforme necessário.
 
 ## Executando o Cérebro
 
@@ -88,7 +89,7 @@ python main.py
 ```
 Isso ativará o Cerebro na sua conta do Telegram, pronto para receber e processar suas entradas. Da primeira vez que você tentar conversar com o Cerebro ele não identificará você. Você precisará capturar o código do usuário no terminal e inserí-lo no arquivo `secrets_cerebro.py`
 
-**Inicialização do Banco de Dados**: A primeira execução do `main.py` configurará automaticamente o banco de dados SQLite necessário para armazenar dados da sessão.
+**Inicialização do Banco de Dados**: A primeira execução do `main.py` configurará automaticamente o banco de dados necessário (Supabase ou SQLite local, dependendo da configuração em `src/config/settings.py`) para armazenar dados da sessão.
 
 ## Uso
 
@@ -103,6 +104,31 @@ Isso ativará o Cerebro na sua conta do Telegram, pronto para receber e processa
 | `/start` | Inicia a conversa com o bot e exibe uma mensagem de boas-vindas |
 | `/listar` | Lista as últimas 10 ideias salvas no banco de dados |
 | `/ver <id>` | Mostra os detalhes completos de uma ideia específica, incluindo brainstorms associados |
+
+## Banco de Dados
+
+O Cerebro suporta dois tipos de armazenamento de dados:
+
+### SQLite (Local)
+
+- Armazenamento local em arquivo SQLite
+- Não requer configuração adicional
+- Ideal para uso pessoal ou testes
+
+### Supabase (PostgreSQL na nuvem)
+
+- Armazenamento em banco de dados PostgreSQL na nuvem
+- Requer conta no Supabase e configuração das chaves de API
+- Ideal para uso em produção ou quando múltiplos usuários precisam acessar os dados
+
+Para alternar entre SQLite e Supabase, edite a configuração `USE_SUPABASE` no arquivo `src/config/settings.py`:
+
+```python
+# Configuração para usar Supabase em vez do SQLite
+USE_SUPABASE = True  # Mude para False para usar o SQLite local
+```
+
+Para mais informações sobre a configuração do Supabase, consulte o arquivo `README_SUPABASE.md`.
 
 ## Ideias para implementação futura
 
@@ -127,7 +153,7 @@ pkg update -y && pkg upgrade -y
 pkg install -y python git clang libffi openssl
 
 # Clonar o repositório (ou copie os arquivos manualmente)
-git clone https://github.com/seu-usuario/BotCelebroPytom.git
+git clone https://github.com/dionnatas/BotCelebroPytom.git
 cd BotCelebroPytom
 
 # Dar permissão de execução ao script de configuração
@@ -146,6 +172,9 @@ Certifique-se de configurar corretamente o arquivo `secrets_cerebro.py` com suas
 TELEGRAM_API_KEY = "sua_chave_telegram_aqui"
 OPENAI_API_KEY = "sua_chave_openai_aqui"
 MY_CHAT_ID = "seu_chat_id_aqui"  # ou ["id1", "id2"] para múltiplos IDs
+SUPABASE_URL = "sua_url_supabase_aqui"  # opcional, para usar Supabase
+SUPABASE_KEY = "sua_chave_supabase_aqui"  # opcional, para uso anônimo
+SUPABASE_SERVICE_KEY = "sua_chave_servico_supabase_aqui"  # opcional, para operações administrativas
 ```
 
 ### Executando o bot
