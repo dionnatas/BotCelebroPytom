@@ -24,13 +24,15 @@ class IdeaRepository:
         """
         self.db_path = db_path
     
-    def salvar_ideia(self, conteudo: str, chat_id: int) -> Optional[int]:
+    def salvar_ideia(self, conteudo: str, chat_id: int, tipo: str = "ideia", resumo: str = "") -> Optional[int]:
         """
         Salva uma nova ideia no banco de dados.
         
         Args:
             conteudo: Conteúdo da ideia
             chat_id: ID do chat do usuário
+            tipo: Tipo da ideia (padrão: "ideia")
+            resumo: Resumo da ideia (padrão: vazio)
             
         Returns:
             int: ID da ideia salva ou None em caso de erro
@@ -39,13 +41,17 @@ class IdeaRepository:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # Se o resumo estiver vazio, usa as primeiras 100 caracteres do conteúdo
+            if not resumo:
+                resumo = conteudo[:100] + "..." if len(conteudo) > 100 else conteudo
+            
             # Obtém a data atual
             data_criacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
             # Insere a ideia no banco de dados
             cursor.execute(
-                "INSERT INTO ideias (conteudo, chat_id, data_criacao) VALUES (?, ?, ?)",
-                (conteudo, chat_id, data_criacao)
+                "INSERT INTO ideias (tipo, conteudo, resumo, chat_id, data_criacao) VALUES (?, ?, ?, ?, ?)",
+                (tipo, conteudo, resumo, chat_id, data_criacao)
             )
             
             # Obtém o ID da ideia inserida
@@ -77,17 +83,17 @@ class IdeaRepository:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             
-            # Na estrutura atual do banco de dados, não temos a coluna chat_id
-            # Então vamos retornar todas as ideias para superusuários
-            # e nenhuma ideia para usuários normais (até migrarmos o banco)
+            # Se for superusuário, busca todas as ideias
+            # Senão, busca apenas as ideias do usuário
             if is_superuser:
                 cursor.execute(
-                    "SELECT id, tipo, conteudo, resumo, data_criacao FROM ideias ORDER BY id DESC"
+                    "SELECT id, tipo, conteudo, resumo, data_criacao, chat_id FROM ideias ORDER BY id DESC"
                 )
             else:
-                # Como não temos chat_id, retornamos uma lista vazia para usuários normais
-                # Até que o banco de dados seja migrado
-                return []
+                cursor.execute(
+                    "SELECT id, tipo, conteudo, resumo, data_criacao, chat_id FROM ideias WHERE chat_id = ? ORDER BY id DESC",
+                    (chat_id,)
+                )
             
             # Converte os resultados para dicionários
             ideias = [dict(row) for row in cursor.fetchall()]
@@ -142,10 +148,28 @@ class IdeaRepository:
         Returns:
             Dict[str, Any]: Dados da ideia ou None se não encontrada
         """
-        # Na estrutura atual do banco de dados, não temos a coluna chat_id
-        # Então não podemos verificar a propriedade
-        # Retornamos None para usuários normais (até migrarmos o banco)
-        return None
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            # Busca a ideia pelo ID e chat_id
+            cursor.execute(
+                "SELECT * FROM ideias WHERE id = ? AND chat_id = ?",
+                (ideia_id, chat_id)
+            )
+            row = cursor.fetchone()
+            
+            conn.close()
+            
+            if row:
+                return dict(row)
+            else:
+                return None
+                
+        except Exception as e:
+            logger.error(f"Erro ao obter ideia: {str(e)}", exc_info=True)
+            return None
     
     def apagar_ideia(self, ideia_id: int, chat_id: int) -> bool:
         """

@@ -69,9 +69,11 @@ def listar_ideias(update: Update, context: CallbackContext) -> None:
         if len(descricao) > 50:
             descricao = descricao[:47] + "..."
         
-        # Na estrutura atual do banco de dados, não temos a coluna chat_id
-        # Então mostramos apenas o ID e a descrição
-        mensagem += f"*ID {ideia['id']}:* {descricao}\n"
+        # Para superusuários, mostra também o chat_id do autor
+        if superuser and 'chat_id' in ideia and ideia['chat_id'] != chat_id:
+            mensagem += f"*ID {ideia['id']}* (Autor: {ideia['chat_id']}): {descricao}\n"
+        else:
+            mensagem += f"*ID {ideia['id']}:* {descricao}\n"
     
     mensagem += "\nUse /ver [id] para ver os detalhes de uma ideia específica."
     
