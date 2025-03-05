@@ -34,20 +34,26 @@ def handle_message(update: Update, context: CallbackContext) -> None:
         return
     
     if update.message.voice:
-        # Baixar e transcrever áudio
-        file = context.bot.get_file(update.message.voice.file_id)
-        with tempfile.NamedTemporaryFile(delete=True) as temp_audio:
-            file.download(out=temp_audio.name)
-            temp_audio.flush()
-            try:
+        try:
+            # Baixar e transcrever áudio
+            file = context.bot.get_file(update.message.voice.file_id)
+            with tempfile.NamedTemporaryFile(delete=True) as temp_audio:
+                file.download(out=temp_audio.name)
+                temp_audio.flush()
+                
                 logger.info("Transcrevendo áudio...")
                 transcription = openai.Audio.transcribe("whisper-1", open(temp_audio.name, "rb"))
-                user_message = transcription['text']
+                user_message = transcription.get('text', '')
+                
+                if not user_message:
+                    update.message.reply_text("Erro: A transcrição do áudio retornou vazia.")
+                    return
+                
                 update.message.reply_text(f"Transcrição: {user_message}")
-            except Exception as e:
-                logger.error(f"Erro na transcrição: {e}")
-                update.message.reply_text("Erro ao transcrever o áudio.")
-                return
+        except Exception as e:
+            logger.error(f"Erro na transcrição: {e}")
+            update.message.reply_text("Erro ao transcrever o áudio.")
+            return
     else:
         user_message = update.message.text
     
@@ -60,7 +66,12 @@ def handle_message(update: Update, context: CallbackContext) -> None:
                 {"role": "user", "content": user_message}
             ]
         )
-        reply = response['choices'][0]['message']['content']
+        
+        if 'choices' in response and len(response['choices']) > 0:
+            reply = response['choices'][0]['message']['content']
+        else:
+            reply = "Erro: A resposta do OpenAI veio vazia."
+        
         update.message.reply_text(reply)
     except Exception as e:
         logger.error(f"Erro ao gerar resposta do OpenAI: {e}")
@@ -77,8 +88,8 @@ def main():
             logger.info("Bot iniciado com sucesso!")
             app.run_polling()
         except Exception as e:
-            logger.error(f"Erro na conexão: {e}. Tentando reconectar em 5 segundos...")
-            time.sleep(1)  # Espera 5 segundos antes de tentar novamente
+            logger.error(f"Erro na conexão: {e}. Tentando reconectar em 1 segundo...")
+            time.sleep(1)  # Espera 1 segundo antes de tentar novamente
 
 if __name__ == "__main__":
     main()
