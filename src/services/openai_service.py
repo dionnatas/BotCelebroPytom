@@ -9,7 +9,7 @@ import openai
 import requests
 
 from src.config.settings import OPENAI_API_KEY, OPENAI_MODEL, OPENAI_TEMPERATURE
-from src.config.prompts import CLASSIFICADOR_PROMPT, BRAINSTORM_PROMPT
+from src.config.prompts import CLASSIFICADOR_PROMPT, BRAINSTORM_PROMPT, QUESTAO_PROMPT
 
 # Configuração da API da OpenAI
 openai.api_key = OPENAI_API_KEY
@@ -114,6 +114,43 @@ class OpenAIService:
         except Exception as e:
             logger.error(f"Erro ao gerar brainstorm: {e}")
             return f"Erro ao gerar brainstorm: {e}"
+    
+    @staticmethod
+    def responder_questao(questao: str) -> str:
+        """
+        Responde a uma questão do usuário usando o modelo de IA.
+        
+        Args:
+            questao: Texto da questão
+            
+        Returns:
+            str: Texto da resposta gerada
+        """
+        try:
+            logger.info("Respondendo questão...")
+            
+            # Prepara o prompt completo
+            prompt_completo = f"{QUESTAO_PROMPT}\n{questao}"
+            
+            # Faz a chamada para a API da OpenAI
+            response = openai.ChatCompletion.create(
+                model=OPENAI_MODEL,
+                messages=[
+                    {"role": "system", "content": "Você é um assistente virtual útil e informativo."},
+                    {"role": "user", "content": prompt_completo}
+                ],
+                temperature=OPENAI_TEMPERATURE
+            )
+            
+            # Extrai a resposta
+            resposta = response.choices[0].message.content.strip()
+            logger.info("Resposta gerada com sucesso")
+            
+            return resposta
+            
+        except Exception as e:
+            logger.error(f"Erro ao responder questão: {e}")
+            return f"Desculpe, não consegui processar sua pergunta devido a um erro: {e}"
 
 
 # Instância global do serviço OpenAI

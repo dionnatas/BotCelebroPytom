@@ -33,3 +33,9 @@ Oportunidades
 
 Segue ideia para análise:
 """
+
+QUESTAO_PROMPT = """
+Você deverá responder a mensagem considerando sempre que trata-se de uma pergunta..
+
+Segue mensagem para análise:
+""" 

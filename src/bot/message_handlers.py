@@ -63,13 +63,26 @@ def process_message(update: Update, context: CallbackContext, message_text: str)
             )
         else:
             update.message.reply_text("❌ Erro ao salvar sua ideia. Por favor, tente novamente mais tarde.")
+    elif classificacao.upper() == "QUESTAO":
+        # Responde à questão usando a API da OpenAI
+        update.message.reply_text("🤔 Processando sua pergunta... Aguarde um momento.")
+        
+        # Gera a resposta
+        resposta = openai_service.responder_questao(message_text)
+        
+        # Envia a resposta formatada
+        update.message.reply_text(
+            f"*Resposta:*\n\n{resposta}",
+            parse_mode=ParseMode.MARKDOWN
+        )
     else:
-        # Responde de acordo com a classificação
+        # Responde de acordo com a classificação para outros tipos de mensagem
         update.message.reply_text(
             f"Entendi sua mensagem como: {classificacao}\n"
             f"Categoria: {categoria}\n"
             f"Ação recomendada: {acao}\n\n"
-            "Para salvar uma ideia e gerar um brainstorm, por favor envie uma mensagem descrevendo sua ideia."
+            "Para salvar uma ideia, envie uma mensagem descrevendo sua ideia.\n"
+            "Para fazer uma pergunta, inicie com palavras como 'o que', 'como', 'por que', etc."
         )
 
 def handle_message(update: Update, context: CallbackContext) -> None:
