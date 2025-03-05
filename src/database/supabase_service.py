@@ -146,14 +146,17 @@ class SupabaseService:
             logger.info(f"Obtendo ideia {ideia_id} para chat_id {chat_id} (superuser: {is_superuser})")
             
             # Construir a query
-            query = self.supabase.table(TABELA_IDEIAS).eq("id", ideia_id)
+            query = self.supabase.table(TABELA_IDEIAS).select("*")
+            
+            # Filtrar por ID
+            query = query.eq("id", ideia_id)
             
             # Se não for superusuário, filtrar por chat_id
             if not is_superuser:
                 query = query.eq("chat_id", chat_id)
             
             # Executar a query
-            response = query.select("*").execute()
+            response = query.execute()
             
             # Verificar se a consulta foi bem-sucedida e se retornou algum resultado
             if response.data and len(response.data) > 0:
