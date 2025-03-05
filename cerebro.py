@@ -4,7 +4,7 @@ import secrets_cerebro
 import tempfile
 import time
 import os
-import tzdata
+import pytz
 
 
 from datetime import datetime
@@ -82,6 +82,13 @@ def handle_message(update: Update, context: CallbackContext) -> None:
 
 os.environ['TZ'] = 'UTC'
 time.tzset()
+
+def configure_timezone():
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+    scheduler = AsyncIOScheduler(timezone=pytz.UTC)
+    scheduler.start()
+
+configure_timezone()
 
 def main():
     """Inicializa o bot."""
