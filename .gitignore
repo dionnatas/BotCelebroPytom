@@ -1,7 +1,39 @@
+# Arquivos de cache Python
 __pycache__/
-log.txt
-*.ogg
-test*.py
-*.db
-secrets_cerebro.py
+*.py[cod]
+*$py.class
+
+# Ambiente virtual
 venv/
+env/
+.env/
+
+# Arquivos de configuração
+secrets_cerebro.py
+
+# Arquivos de log e banco de dados
+*.log
+*.db
+*.db.bak
+log.txt
+
+# Arquivos temporários
+*.pid
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Arquivos de áudio para teste
+*.ogg
+*.wav
+*.mp3
+*.m4a
+sample.wav
+
+# Arquivos de backup
+backup*/
+*.bak
+
+# Arquivos de teste
+test*.py
