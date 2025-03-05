@@ -198,6 +198,43 @@ class DatabaseManager:
             if conn:
                 conn.close()
     
+    def atualizar_brainstorm(self, brainstorm_id: int, novo_conteudo: str) -> bool:
+        """
+        Atualiza o conteúdo de um brainstorm existente.
+        
+        Args:
+            brainstorm_id: ID do brainstorm a ser atualizado
+            novo_conteudo: Novo conteúdo do brainstorm
+            
+        Returns:
+            bool: True se o brainstorm foi atualizado com sucesso, False caso contrário
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Verifica se o brainstorm existe
+            cursor.execute("SELECT id FROM brainstorms WHERE id = ?", (brainstorm_id,))
+            if not cursor.fetchone():
+                logger.warning(f"Tentativa de atualizar brainstorm inexistente: {brainstorm_id}")
+                return False
+            
+            # Atualiza o brainstorm
+            cursor.execute(
+                "UPDATE brainstorms SET conteudo = ?, data_criacao = ? WHERE id = ?",
+                (novo_conteudo, datetime.now(), brainstorm_id)
+            )
+            
+            conn.commit()
+            logger.info(f"Brainstorm {brainstorm_id} atualizado com sucesso")
+            return True
+        except sqlite3.Error as e:
+            logger.error(f"Erro ao atualizar brainstorm {brainstorm_id}: {e}")
+            return False
+        finally:
+            if conn:
+                conn.close()
+    
     def apagar_ideia(self, ideia_id: int) -> bool:
         """
         Apaga uma ideia e seus brainstorms relacionados do banco de dados.

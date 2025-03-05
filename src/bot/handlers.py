@@ -59,7 +59,8 @@ def start(update: Update, context: CallbackContext) -> None:
         "/comandos - Mostra a lista completa de comandos disponíveis\n"
         "/listar - Lista suas ideias salvas\n"
         "/ver [id] - Mostra detalhes de uma ideia específica\n"
-        "/apagar [id] - Apaga uma ideia específica"
+        "/apagar [id] - Apaga uma ideia específica\n"
+        "/refazer [id] - Refaz o brainstorm de uma ideia"
     )
 
 def process_message(update: Update, context: CallbackContext, message_text: str) -> None:
@@ -423,6 +424,66 @@ def confirmar_apagar_ideia(update: Update, context: CallbackContext) -> None:
     if 'ideia_para_apagar' in context.user_data:
         del context.user_data['ideia_para_apagar']
 
+def refazer_brainstorm(update: Update, context: CallbackContext) -> None:
+    """
+    Refaz um brainstorm existente.
+    
+    Args:
+        update: Objeto Update do Telegram
+        context: Contexto do callback
+    """
+    if not check_authorization(update):
+        return
+    
+    # Verifica se foi fornecido um ID
+    if not context.args or not context.args[0].isdigit():
+        update.message.reply_text(
+            "Por favor, forneça o ID da ideia para a qual deseja refazer o brainstorm.\n"
+            "Exemplo: /refazer 123"
+        )
+        return
+    
+    ideia_id = int(context.args[0])
+    
+    # Obtém a ideia
+    ideia = db_manager.obter_ideia(ideia_id)
+    if not ideia:
+        update.message.reply_text(f"Ideia com ID {ideia_id} não encontrada.")
+        return
+    
+    # Verifica se a ideia já tem brainstorms
+    if not ideia.get('brainstorms'):
+        update.message.reply_text(
+            f"A ideia '{ideia['resumo']}' ainda não tem nenhum brainstorm.\n"
+            f"Use o comando /ver {ideia_id} e responda 'sim' quando perguntado sobre fazer um brainstorm."
+        )
+        return
+    
+    # Informa o usuário que está gerando um novo brainstorm
+    update.message.reply_text(
+        f"Gerando um novo brainstorm para a ideia: *{ideia['resumo']}*\n\n"
+        "Isso pode levar alguns segundos...",
+        parse_mode=ParseMode.MARKDOWN
+    )
+    
+    # Gera o novo brainstorm
+    brainstorm_text = openai_service.gerar_brainstorm(ideia['conteudo'])
+    
+    # Atualiza o brainstorm mais recente no banco de dados
+    brainstorm_id = ideia['brainstorms'][0]['id']  # Pega o brainstorm mais recente
+    sucesso = db_manager.atualizar_brainstorm(brainstorm_id, brainstorm_text)
+    
+    if sucesso:
+        # Envia o novo brainstorm para o usuário
+        update.message.reply_text(
+            f"*Novo brainstorm para: {ideia['resumo']}*\n\n{brainstorm_text}",
+            parse_mode=ParseMode.MARKDOWN
+        )
+    else:
+        update.message.reply_text(
+            f"❌ Erro ao atualizar o brainstorm. Por favor, tente novamente mais tarde."
+        )
+
 def listar_comandos(update: Update, context: CallbackContext) -> None:
     """
     Lista todos os comandos disponíveis no bot.
@@ -439,6 +500,7 @@ def listar_comandos(update: Update, context: CallbackContext) -> None:
         ("/listar", "Lista todas as suas ideias salvas"),
         ("/ver ID", "Mostra os detalhes de uma ideia específica"),
         ("/apagar ID", "Apaga uma ideia e seus brainstorms relacionados"),
+        ("/refazer ID", "Refaz o brainstorm de uma ideia existente"),
         ("/comandos", "Mostra esta lista de comandos disponíveis")
     ]
     
