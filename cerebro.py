@@ -70,7 +70,7 @@ def main():
     """Inicializa o bot."""
     while True:
         try:
-            app = Application.builder().token(TELEGRAM_API_KEY).local_timezone(pytz.utc).build()
+            app = Application.builder().token(TELEGRAM_API_KEY).build()
             app.add_handler(CommandHandler("start", start))
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
             
@@ -78,7 +78,7 @@ def main():
             app.run_polling()
         except Exception as e:
             logger.error(f"Erro na conexão: {e}. Tentando reconectar em 5 segundos...")
-            time.sleep(5)  # Espera 5 segundos antes de tentar novamente
+            time.sleep(1)  # Espera 5 segundos antes de tentar novamente
 
 if __name__ == "__main__":
     main()
