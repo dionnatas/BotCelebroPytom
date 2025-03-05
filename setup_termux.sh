@@ -16,6 +16,9 @@ pip install -r requirements.txt
 echo "Verificando a versão da biblioteca python-telegram-bot..."
 python check_telegram_bot.py
 
+echo "Verificando a versão da API OpenAI..."
+python check_openai.py
+
 echo "Aplicando correções para o ambiente Termux..."
 python fix_termux.py
 

@@ -146,26 +146,43 @@ Você tem várias opções para executar o bot no Termux:
 
 #### 1. Usando os scripts prontos
 
-O projeto inclui três scripts para facilitar a execução no Termux:
+O projeto inclui vários scripts para facilitar a execução e gerenciamento do bot no Termux:
 
+##### Scripts de configuração e execução:
 - `setup_termux.sh`: Configura o ambiente, instala dependências e verifica a configuração.
 - `run_termux.sh`: Executa o bot no modo normal (terminal ativo).
 - `run_background.sh`: Executa o bot em segundo plano, permitindo fechar o Termux.
+
+##### Scripts de gerenciamento:
+- `status_bot.sh`: Verifica o status atual do bot, mostra informações de uso de recursos e últimas linhas do log.
+- `stop_bot.sh`: Para o bot de forma segura, garantindo que todos os processos sejam encerrados corretamente.
+- `restart_bot.sh`: Reinicia o bot, útil para aplicar atualizações ou corrigir problemas.
+
+##### Scripts de correção:
+- `fix_termux.py`: Corrige problemas de compatibilidade específicos do Termux.
+- `check_telegram_bot.py`: Verifica e instala a versão correta da biblioteca python-telegram-bot.
+- `check_openai.py`: Verifica e instala a versão recomendada (0.28.0) da API OpenAI.
 
 Para usar os scripts:
 
 ```sh
 # Dê permissão de execução aos scripts (apenas uma vez)
-chmod +x setup_termux.sh run_termux.sh run_background.sh
+chmod +x setup_termux.sh run_termux.sh run_background.sh stop_bot.sh status_bot.sh restart_bot.sh
 
 # Configure o ambiente
 ./setup_termux.sh
 
-# Execute o bot normalmente
-./run_termux.sh
-
-# OU execute em segundo plano
+# Execute o bot em segundo plano
 ./run_background.sh
+
+# Verifique o status do bot
+./status_bot.sh
+
+# Para o bot quando quiser
+./stop_bot.sh
+
+# Reinicie o bot (para aplicar atualizações)
+./restart_bot.sh
 ```
 
 #### 2. Executando manualmente
@@ -189,6 +206,46 @@ python fix_termux.py
 ```
 
 Este script corrige problemas comuns, como a importação do `ParseMode`.
+
+## Solução de Problemas
+
+### Problemas com transcrição de áudio
+
+Se você encontrar erros ao enviar mensagens de áudio, como `'str' object has no attribute 'write'`, tente as seguintes soluções:
+
+1. **Verifique a versão da API OpenAI**:
+   ```sh
+   python check_openai.py
+   ```
+   A versão recomendada é a 0.28.0, que é compatível com o código do bot.
+
+2. **Aplique as correções para o Termux**:
+   ```sh
+   python fix_termux.py
+   ```
+
+3. **Reinicie o bot**:
+   ```sh
+   ./restart_bot.sh
+   ```
+
+### Problemas com respostas ao brainstorm
+
+Se o bot não reconhecer suas respostas como "Sim" ou "Não", certifique-se de que o script `fix_termux.py` foi executado, pois ele corrige o problema de case sensitivity nas respostas.
+
+### Outros problemas
+
+Se você encontrar outros problemas, verifique os logs do bot:
+
+```sh
+./status_bot.sh
+```
+
+Ou visualize o arquivo de log completo:
+
+```sh
+cat cerebro.log
+```
 
 ## Contribuindo
 

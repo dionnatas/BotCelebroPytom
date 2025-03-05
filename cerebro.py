@@ -6,6 +6,7 @@ import time
 import json
 import sqlite3
 import requests
+import re
 from datetime import datetime
 from telegram import Update
 
@@ -36,6 +37,13 @@ MY_CHAT_ID = secrets_cerebro.MY_CHAT_ID
 
 # Configuração da API da OpenAI
 openai.api_key = OPENAI_API_KEY
+
+# Verifica a versão da API OpenAI
+try:
+    openai_version = openai.__version__
+    logger.info(f"Usando OpenAI API versão: {openai_version}")
+except AttributeError:
+    logger.info("Não foi possível determinar a versão da API OpenAI")
 
 # Inicializa o banco de dados
 def init_db():
@@ -172,12 +180,71 @@ def handle_message(update: Update, context: CallbackContext) -> None:
                 temp_audio.flush()
                 
                 logger.info("Transcrevendo áudio...")
-                with open(temp_audio.name, "rb") as audio_file:
-                    transcription = openai.Audio.transcribe(
-                        "whisper-1", 
-                        audio_file
-                    )
-                user_message = transcription.get('text', '')
+                # Verifica a versão da API OpenAI e usa o método apropriado
+                try:
+                    # Para versão 0.28.0 ou anterior
+                    with open(temp_audio.name, "rb") as audio_file:
+                        transcription = openai.Audio.transcribe(
+                            "whisper-1", 
+                            audio_file
+                        )
+                    user_message = transcription.get('text', '')
+                    logger.info(f"Transcrição bem-sucedida usando método antigo: {user_message[:30]}...")
+                except (AttributeError, TypeError) as e:
+                    logger.info(f"Tentando método alternativo de transcrição: {e}")
+                    try:
+                        # Para versões mais recentes da API
+                        with open(temp_audio.name, "rb") as audio_file:
+                            # Cria uma cópia temporária do arquivo para evitar problemas de seek
+                            audio_data = audio_file.read()
+                        
+                        # Usa o método mais recente da API
+                        import io
+                        audio_bytes = io.BytesIO(audio_data)
+                        audio_bytes.name = "audio.ogg"  # Nome necessário para alguns clientes da API
+                        
+                        try:
+                            # Tenta o método da API v1
+                            transcription = openai.audio.transcriptions.create(
+                                model="whisper-1",
+                                file=audio_bytes
+                            )
+                            user_message = transcription.text if hasattr(transcription, 'text') else str(transcription)
+                            logger.info(f"Transcrição bem-sucedida usando método v1: {user_message[:30]}...")
+                        except Exception as e3:
+                            logger.info(f"Tentando método final de transcrição: {e3}")
+                            # Última tentativa - método mais básico
+                            import requests
+                            
+                            headers = {
+                                "Authorization": f"Bearer {OPENAI_API_KEY}"
+                            }
+                            
+                            audio_bytes.seek(0)  # Reinicia a posição do buffer
+                            files = {
+                                "file": ("audio.ogg", audio_bytes, "audio/ogg")
+                            }
+                            data = {
+                                "model": "whisper-1"
+                            }
+                            
+                            response = requests.post(
+                                "https://api.openai.com/v1/audio/transcriptions",
+                                headers=headers,
+                                files=files,
+                                data=data
+                            )
+                            
+                            if response.status_code == 200:
+                                result = response.json()
+                                user_message = result.get("text", "")
+                                logger.info(f"Transcrição bem-sucedida usando requests: {user_message[:30]}...")
+                            else:
+                                logger.error(f"Erro na API: {response.status_code} - {response.text}")
+                                raise Exception(f"Erro na API: {response.status_code}")
+                    except Exception as e2:
+                        logger.error(f"Todos os métodos de transcrição falharam: {e2}")
+                        raise
                 
                 if not user_message:
                     update.message.reply_text("Erro: A transcrição do áudio retornou vazia.")
@@ -186,7 +253,10 @@ def handle_message(update: Update, context: CallbackContext) -> None:
                 update.message.reply_text(f"Transcrição: {user_message}")
         except Exception as e:
             logger.error(f"Erro na transcrição: {e}")
-            update.message.reply_text("Erro ao transcrever o áudio.")
+            update.message.reply_text(
+                "Erro ao transcrever o áudio. Por favor, tente novamente ou envie sua mensagem como texto.\n"
+                "Se o problema persistir, verifique se a versão da biblioteca OpenAI é compatível (0.28.0 recomendada)."
+            )
             return
     else:
         user_message = update.message.text
@@ -361,7 +431,7 @@ def main():
     dispatcher.add_handler(CommandHandler("ver", ver_ideia))
     
     # Adiciona handler para respostas de brainstorm
-    dispatcher.add_handler(MessageHandler(Filters.text & (Filters.regex('^(sim|s|yes|y|não|nao|n|no)$')), handle_brainstorm_response))
+    dispatcher.add_handler(MessageHandler(Filters.text & (Filters.regex('^(sim|s|yes|y|não|nao|n|no)$', re.IGNORECASE)), handle_brainstorm_response))
     
     # Adiciona handler para mensagens gerais
     dispatcher.add_handler(MessageHandler(Filters.text | Filters.voice, handle_message))
