@@ -5,7 +5,7 @@ import tempfile
 import time
 import os
 import pytz
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 
 
 from datetime import datetime
@@ -81,8 +81,8 @@ def handle_message(update: Update, context: CallbackContext) -> None:
         logger.error(f"Erro ao gerar resposta do OpenAI: {e}")
         update.message.reply_text("Erro ao gerar resposta. Tente novamente.")
 
-scheduler = AsyncIOScheduler(timezone=pytz.UTC)
-scheduler.start()
+
+
 
 
 
