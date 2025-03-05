@@ -20,7 +20,10 @@ BotCelebroPytom/
 │   ├── bot/                  # Módulo do bot Telegram
 │   │   ├── __init__.py
 │   │   ├── cerebro_bot.py    # Implementação principal do bot
-│   │   └── handlers.py       # Handlers para comandos e mensagens
+│   │   ├── command_handlers.py # Handlers para comandos
+│   │   ├── message_handlers.py # Handlers para mensagens de texto
+│   │   ├── voice_handlers.py   # Handlers para mensagens de voz
+│   │   └── bot_utils.py      # Utilitários para o bot
 │   │
 │   ├── config/               # Configurações
 │   │   ├── __init__.py
@@ -29,7 +32,9 @@ BotCelebroPytom/
 │   │
 │   ├── database/             # Gerenciamento de banco de dados
 │   │   ├── __init__.py
-│   │   └── db_manager.py     # Operações de banco de dados
+│   │   ├── db_manager.py     # Operações de banco de dados (compatibilidade)
+│   │   ├── idea_repository.py # Repositório para ideias
+│   │   └── brainstorm_repository.py # Repositório para brainstorms
 │   │
 │   ├── services/             # Serviços externos
 │   │   ├── __init__.py
