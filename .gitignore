@@ -38,3 +38,4 @@ backup*/
 # Arquivos de teste
 test*.py
 var/db/backups/
+var/logs/cerebro.log
