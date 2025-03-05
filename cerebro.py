@@ -83,10 +83,7 @@ def handle_message(update: Update, context: CallbackContext) -> None:
 os.environ['TZ'] = 'UTC'
 time.tzset()
 
-def configure_timezone():
-    from apscheduler.schedulers.asyncio import AsyncIOScheduler
-    scheduler = AsyncIOScheduler(timezone=pytz.UTC)
-    scheduler.start()
+
 
 configure_timezone()
 
