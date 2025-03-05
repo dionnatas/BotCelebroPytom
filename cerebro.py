@@ -79,7 +79,7 @@ def main():
     """Inicializa o bot."""
     while True:
         try:
-            app = Application.builder().token(TELEGRAM_API_KEY).build()
+            app = Application.builder().token(TELEGRAM_API_KEY).post_init(lambda x: setattr(x, '_job_queue', None)).build()
             app.add_handler(CommandHandler("start", start))
             app.add_handler(MessageHandler(filters.TEXT | filters.VOICE, handle_message))
             
