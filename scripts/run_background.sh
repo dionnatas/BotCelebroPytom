@@ -27,8 +27,19 @@ echo "Iniciando o bot Cerebro em segundo plano..."
 # Define os caminhos para logs e PID
 LOG_FILE="$PROJECT_DIR/var/logs/cerebro.log"
 
-# Executa o bot em segundo plano
-nohup python3 main.py > "$LOG_FILE" 2>&1 &
+# Verifica se o ambiente virtual existe
+if [ ! -d "$PROJECT_DIR/venv" ]; then
+    echo "Ambiente virtual não encontrado. Criando..."
+    python3 -m venv venv
+    echo "Ambiente virtual criado. Instalando dependências..."
+    source "$PROJECT_DIR/venv/bin/activate"
+    pip install --upgrade pip
+    pip install -r requirements.txt
+    echo "Dependências instaladas com sucesso."
+fi
+
+# Ativa o ambiente virtual e executa o bot em segundo plano
+source "$PROJECT_DIR/venv/bin/activate" && nohup "$PROJECT_DIR/venv/bin/python" main.py > "$LOG_FILE" 2>&1 &
 
 # Salva o PID
 echo $! > "$PID_FILE"
