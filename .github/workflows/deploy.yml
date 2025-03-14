@@ -1,0 +1,71 @@
+name: Deploy Bot Cerebro
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Permite execução manual através da interface do GitHub
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Obtém todo o histórico para garantir que temos todas as alterações
+      
+      - name: Configurar SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Adicionar host conhecido
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+      
+      - name: Deploy para o servidor
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          echo "Iniciando deploy para o servidor..."
+          
+          # Backup do banco de dados remoto
+          ssh $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && \
+            mkdir -p backups && \
+            [ -f var/db/cerebro.db ] && \
+            cp var/db/cerebro.db backups/cerebro_$(date +%Y%m%d_%H%M%S).db || \
+            echo 'Banco de dados não encontrado, pulando backup.'"
+          
+          # Atualizar código no servidor
+          ssh $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && \
+            git fetch origin && \
+            git reset --hard origin/main && \
+            echo 'Código atualizado com sucesso!'"
+          
+          # Atualizar dependências
+          ssh $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && \
+            [ -f venv/bin/activate ] && \
+            source venv/bin/activate && \
+            pip install -r requirements.txt || \
+            pip install -r requirements.txt"
+          
+          # Reiniciar o bot
+          ssh $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && \
+            [ -f scripts/restart_bot.sh ] && \
+            chmod +x scripts/restart_bot.sh && \
+            ./scripts/restart_bot.sh || \
+            echo 'Script de reinicialização não encontrado!'"
+          
+          echo "Deploy concluído com sucesso!"
+      
+      - name: Notificar conclusão
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deploy concluído com sucesso!"
+          else
+            echo "❌ Falha no deploy. Verifique os logs para mais detalhes."
+          fi
