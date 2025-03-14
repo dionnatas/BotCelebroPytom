@@ -2,42 +2,43 @@
     <img src="img/cerebro.png" alt="cerebro">
 </p>
 
-# Cerebro - Bot Telegram
+# 🧠 Cerebro - Bot Telegram
 
-## Índice
-- [Visão Geral](#visão-geral)
-- [Características](#características)
-- [Instalação Rápida](#instalação-rápida)
-- [Configuração](#configuração)
-- [Uso](#uso)
-- [Banco de Dados](#banco-de-dados)
-- [Solução de Problemas](#solução-de-problemas)
-- [Documentação Detalhada](#documentação-detalhada)
+## 📋 Índice
+- [🔭 Visão Geral](#visão-geral)
+- [✨ Características](#características)
+- [🚀 Instalação Rápida](#instalação-rápida)
+- [⚙️ Configuração](#configuração)
+- [🎮 Uso](#uso)
+- [💾 Banco de Dados](#banco-de-dados)
+- [🛠️ Solução de Problemas](#solução-de-problemas)
+- [📚 Documentação Detalhada](#documentação-detalhada)
 
-## Visão Geral
+## 🔭 Visão Geral
 
 Cerebro é um bot do Telegram que tem o objetivo de ser seu segundo cérebro por meio do processamento de linguagem natural e inteligência artificial. Ele utiliza LLMs para interpretar entradas de voz e texto, facilitando uma experiência única para alavancar seu potencial. Ideal para criadores, escritores e qualquer pessoa que deseje explorar e expandir suas ideias, o Cérebro atua como um parceiro usando ferramentas de inteligência artificial.
 
-## Características
+## ✨ Características
 
 Principais funcionalidades implementadas:
-- Processamento de entradas de voz e texto
-- Identificação e categorização de ideias
-- Sessão de brainstorming automatizada com base nas ideias identificadas
-- Armazenamento persistente de ideias e sessões no Supabase (banco de dados PostgreSQL na nuvem)
-- Backup local em SQLite como alternativa
-- Modelo de interação flexível, apoiando tanto a exploração imediata quanto adiada das ideias
+- 🎤 Processamento de entradas de voz e texto
+- 💡 Identificação e categorização de ideias
+- 🧩 Sessão de brainstorming automatizada com base nas ideias identificadas
+- 🗃️ Armazenamento persistente de ideias e sessões no Supabase (banco de dados PostgreSQL na nuvem)
+- 💽 Backup local em SQLite como alternativa
+- 🔄 Modelo de interação flexível, apoiando tanto a exploração imediata quanto adiada das ideias
+- 🔄 Atualização automática via GitHub
 
 ## Instalação
 
-### Pré-requisitos
+### 📋 Pré-requisitos
 
-- Python 3.9+ (testado com Python 3.9.6 e 3.10.7)
-- Uma conta no Telegram
-- Chaves de API para OpenAI e Telegram Bot
-- Conta no Supabase (opcional, pode usar SQLite local)
+- 🐍 Python 3.9+ (testado com Python 3.9.6 e 3.10.7)
+- 📱 Uma conta no Telegram
+- 🔑 Chaves de API para OpenAI e Telegram Bot
+- 🌐 Conta no Supabase (opcional, pode usar SQLite local)
 
-### Configuração
+### ⚙️ Configuração
 
 1. **Copie os arquivos do projeto**: Baixe os arquivos projeto para sua máquina local e salve em uma pasta ou faça o clone do repositório do GitHub usando o comando `git clone`.
 ```sh
@@ -83,7 +84,7 @@ Se for no <b>prompt de comando</b>
 pip install -r requirements.txt
 ```
 
-### Criando Seu Bot do Telegram com o BotFather
+### 🤖 Criando Seu Bot do Telegram com o BotFather
 
 1. **Inicie o BotFather**: No Telegram, procure pela conta do BotFather (@BotFather), o bot oficial para criar e gerenciar bots do Telegram.
 
@@ -93,7 +94,7 @@ pip install -r requirements.txt
 
 4. **Configuração de APIs**: Renomeie `secrets_cerebro.py.example` para `secrets_cerebro.py` e preencha-o com suas chaves de API do Telegram, OpenAI e Supabase (se estiver usando) conforme necessário.
 
-## Executando o Cérebro
+## 🚀 Executando o Cérebro
 
 Execute `main.py` para iniciar o bot:
 ```sh
@@ -103,13 +104,13 @@ Isso ativará o Cerebro na sua conta do Telegram, pronto para receber e processa
 
 **Inicialização do Banco de Dados**: A primeira execução do `main.py` configurará automaticamente o banco de dados necessário (Supabase ou SQLite local, dependendo da configuração em `src/config/settings.py`) para armazenar dados da sessão.
 
-## Uso
+## 🎮 Uso
 
-- **Captura de Ideias por Voz**: Envie uma mensagem de voz para o Cérebro com sua ideia, e ele a processará e perguntará se você deseja fazer um brainstorming sobre essa ideia.
-- **Entrada de Texto**: Envie mensagens de texto para ideias rápidas ou comandos para gerenciar suas sessões de ideias.
-- **Sessões de Brainstorming**: Siga as instruções do bot para explorar e expandir suas ideias.
+- 🎤 **Captura de Ideias por Voz**: Envie uma mensagem de voz para o Cérebro com sua ideia, e ele a processará e perguntará se você deseja fazer um brainstorming sobre essa ideia.
+- 💬 **Entrada de Texto**: Envie mensagens de texto para ideias rápidas ou comandos para gerenciar suas sessões de ideias.
+- 🧪 **Sessões de Brainstorming**: Siga as instruções do bot para explorar e expandir suas ideias.
 
-### Comandos Disponíveis
+### ⌨️ Comandos Disponíveis
 
 | Comando | Descrição |
 |---------|------------|
@@ -117,17 +118,17 @@ Isso ativará o Cerebro na sua conta do Telegram, pronto para receber e processa
 | `/listar` | Lista as últimas 10 ideias salvas no banco de dados |
 | `/ver <id>` | Mostra os detalhes completos de uma ideia específica, incluindo brainstorms associados |
 
-## Banco de Dados
+## 💾 Banco de Dados
 
 O Cerebro suporta dois tipos de armazenamento de dados:
 
-### SQLite (Local)
+### 💽 SQLite (Local)
 
 - Armazenamento local em arquivo SQLite
 - Não requer configuração adicional
 - Ideal para uso pessoal ou testes
 
-### Supabase (PostgreSQL na nuvem)
+### ☁️ Supabase (PostgreSQL na nuvem)
 
 - Armazenamento em banco de dados PostgreSQL na nuvem
 - Requer conta no Supabase e configuração das chaves de API
@@ -142,17 +143,17 @@ USE_SUPABASE = True  # Mude para False para usar o SQLite local
 
 Para mais informações sobre a configuração do Supabase, consulte o arquivo `README_SUPABASE.md`.
 
-## Ideias para implementação futura
+## 💡 Ideias para implementação futura
 
-- **Gestão de aniversários**: Sempre esqueço de algumas datas, gostaria de ajuda pra me lembrar e eventualmente escrever mensagens personalizadas
-- **Adicionar elementos às ideias existentes**: Permitir ao usuário complementar elementos às ideias existentes
-- **Incorporar agentes (crewAI) para realização de tarefas específicas**
+- 🎂 **Gestão de aniversários**: Sempre esqueço de algumas datas, gostaria de ajuda pra me lembrar e eventualmente escrever mensagens personalizadas
+- ✍️ **Adicionar elementos às ideias existentes**: Permitir ao usuário complementar elementos às ideias existentes
+- 🪐 **Incorporar agentes (crewAI) para realização de tarefas específicas**
 
-## Execução no Termux (Android)
+## 📱 Execução no Termux (Android)
 
 Você pode executar o Cerebro diretamente no seu celular Android usando o Termux. Isso permite que você mantenha o bot funcionando no seu dispositivo móvel.
 
-### Instalação do Termux
+### 📲 Instalação do Termux
 
 1. Instale o Termux pela [F-Droid](https://f-droid.org/en/packages/com.termux/) (recomendado) ou pela Google Play Store.
 2. Abra o Termux e execute os seguintes comandos:
@@ -175,7 +176,7 @@ chmod +x setup_termux.sh
 ./setup_termux.sh
 ```
 
-### Configurando as chaves de API
+### 🔑 Configurando as chaves de API
 
 Certifique-se de configurar corretamente o arquivo `secrets_cerebro.py` com suas chaves de API:
 
@@ -189,25 +190,25 @@ SUPABASE_KEY = "sua_chave_supabase_aqui"  # opcional, para uso anônimo
 SUPABASE_SERVICE_KEY = "sua_chave_servico_supabase_aqui"  # opcional, para operações administrativas
 ```
 
-### Executando o bot
+### ▶️ Executando o bot
 
 Você tem várias opções para executar o bot no Termux:
 
-#### 1. Usando os scripts prontos
+#### 1️⃣ Usando os scripts prontos
 
 O projeto inclui vários scripts para facilitar a execução e gerenciamento do bot no Termux:
 
-##### Scripts de configuração e execução:
+##### 📊 Scripts de configuração e execução:
 - `setup_termux.sh`: Configura o ambiente, instala dependências e verifica a configuração.
 - `run_termux.sh`: Executa o bot no modo normal (terminal ativo).
 - `run_background.sh`: Executa o bot em segundo plano, permitindo fechar o Termux.
 
-##### Scripts de gerenciamento:
+##### 💱 Scripts de gerenciamento:
 - `status_bot.sh`: Verifica o status atual do bot, mostra informações de uso de recursos e últimas linhas do log.
 - `stop_bot.sh`: Para o bot de forma segura, garantindo que todos os processos sejam encerrados corretamente.
 - `restart_bot.sh`: Reinicia o bot, útil para aplicar atualizações ou corrigir problemas.
 
-##### Scripts de correção:
+##### 🔧 Scripts de correção:
 - `fix_termux.py`: Corrige problemas de compatibilidade específicos do Termux.
 - `check_telegram_bot.py`: Verifica e instala a versão correta da biblioteca python-telegram-bot.
 - `check_openai.py`: Verifica e instala a versão recomendada (0.28.0) da API OpenAI.
@@ -234,7 +235,7 @@ chmod +x setup_termux.sh run_termux.sh run_background.sh stop_bot.sh status_bot.
 ./restart_bot.sh
 ```
 
-#### 2. Executando manualmente
+#### 2️⃣ Executando manualmente
 
 Se preferir, você pode executar o bot manualmente:
 
@@ -246,7 +247,7 @@ python main.py
 nohup python main.py > cerebro.log 2>&1 &
 ```
 
-#### 3. Corrigindo problemas de compatibilidade
+#### 3️⃣ Corrigindo problemas de compatibilidade
 
 Se encontrar problemas de compatibilidade, execute o script de correção:
 
@@ -256,9 +257,9 @@ python fix_termux.py
 
 Este script corrige problemas comuns, como a importação do `ParseMode`.
 
-## Solução de Problemas
+## 🛠️ Solução de Problemas
 
-### Problemas com transcrição de áudio
+### 🎤 Problemas com transcrição de áudio
 
 Se você encontrar erros ao enviar mensagens de áudio, como `'str' object has no attribute 'write'`, tente as seguintes soluções:
 
@@ -278,11 +279,11 @@ Se você encontrar erros ao enviar mensagens de áudio, como `'str' object has n
    ./restart_bot.sh
    ```
 
-### Problemas com respostas ao brainstorm
+### 🧩 Problemas com respostas ao brainstorm
 
 Se o bot não reconhecer suas respostas como "Sim" ou "Não", certifique-se de que o script `fix_termux.py` foi executado, pois ele corrige o problema de case sensitivity nas respostas.
 
-### Outros problemas
+### ❓ Outros problemas
 
 Se você encontrar outros problemas, verifique os logs do bot:
 
@@ -290,7 +291,7 @@ Se você encontrar outros problemas, verifique os logs do bot:
 cat logs/cerebro.log
 ```
 
-## Documentação Detalhada
+## 📚 Documentação Detalhada
 
 Para informações mais detalhadas sobre o projeto, consulte os seguintes documentos:
 
